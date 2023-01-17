@@ -1,0 +1,69 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Student {
+  id         Int            @id @default(autoincrement())
+  first_name String         @db.VarChar(255)
+  last_name  String         @db.VarChar(255)
+  age        Int
+  birthday   DateTime
+  sex        String
+  profile    Profile?
+  parent     Parent?         @relation(fields: [parentId], references: [id])
+  parentId   Int
+  relations  Relationship[]
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+}
+
+model Parent {
+  id             Int            @id @default(autoincrement())
+  first_name     String         @db.VarChar(255)
+  last_name      String         @db.VarChar(255)
+  age            Int
+  email          String        @unique @db.VarChar(255)
+  sex            String
+  role           String
+  students       Student[]
+  relations      Relationship[]
+  profile        ParentProfile?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+model ParentProfile {
+  id       Int      @id @default(autoincrement())
+  birthday DateTime
+  phone    String   @unique @db.VarChar(255)
+  location String   @db.VarChar(255)
+  parent   Parent   @relation(fields: [parentId], references: [id])
+  parentId Int      @unique
+}
+
+model Profile {
+  id           Int     @id @default(autoincrement())
+  school_name  String? @db.VarChar(255)
+  school_class String? @db.VarChar(255)
+  sunday_class String  @db.VarChar(255)
+  image        String?
+  student      Student @relation(fields: [studentId], references: [id])
+  studentId    Int     @unique
+}
+
+model Relationship {
+  id        Int     @id @default(autoincrement())
+  status    String
+  parent    Parent  @relation(fields: [parentId], references: [id])
+  parentId  Int
+  student   Student @relation(fields: [studentId], references: [id])
+  studentId Int
+}
