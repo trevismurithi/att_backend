@@ -10,60 +10,90 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id         Int         @id @default(autoincrement())
+  username   String      @unique
+  email      String      @unique
+  role       String
+  birthday   DateTime
+  class      String?
+  password   String
+  attendance Attendace[]
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
+
 model Student {
   id         Int            @id @default(autoincrement())
   first_name String         @db.VarChar(255)
   last_name  String         @db.VarChar(255)
-  age        Int
   birthday   DateTime
   sex        String
   profile    Profile?
-  parent     Parent?         @relation(fields: [parentId], references: [id])
+  parent     Parent?        @relation(fields: [parentId], references: [id])
   parentId   Int
   relations  Relationship[]
+  attendance Attendace[]
   createdAt  DateTime       @default(now())
   updatedAt  DateTime       @updatedAt
 }
 
 model Parent {
-  id             Int            @id @default(autoincrement())
-  first_name     String         @db.VarChar(255)
-  last_name      String         @db.VarChar(255)
-  age            Int
-  email          String        @unique @db.VarChar(255)
-  sex            String
-  role           String
-  students       Student[]
-  relations      Relationship[]
-  profile        ParentProfile?
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  id         Int            @id @default(autoincrement())
+  first_name String         @db.VarChar(255)
+  last_name  String         @db.VarChar(255)
+  email      String         @unique @db.VarChar(255)
+  birthday   DateTime
+  sex        String
+  role       String
+  students   Student[]
+  relations  Relationship[]
+  profile    ParentProfile?
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
 }
 
 model ParentProfile {
-  id       Int      @id @default(autoincrement())
-  birthday DateTime
-  phone    String   @unique @db.VarChar(255)
-  location String   @db.VarChar(255)
-  parent   Parent   @relation(fields: [parentId], references: [id])
-  parentId Int      @unique
+  id        Int      @id @default(autoincrement())
+  phone     String   @unique @db.VarChar(255)
+  location  String   @db.VarChar(255)
+  parent    Parent   @relation(fields: [parentId], references: [id])
+  parentId  Int      @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Profile {
-  id           Int     @id @default(autoincrement())
-  school_name  String? @db.VarChar(255)
-  school_class String? @db.VarChar(255)
-  sunday_class String  @db.VarChar(255)
+  id           Int      @id @default(autoincrement())
+  school_name  String?  @db.VarChar(255)
+  school_class String?  @db.VarChar(255)
+  sunday_class String   @db.VarChar(255)
   image        String?
-  student      Student @relation(fields: [studentId], references: [id])
-  studentId    Int     @unique
+  student      Student  @relation(fields: [studentId], references: [id])
+  studentId    Int      @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model Relationship {
-  id        Int     @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   status    String
-  parent    Parent  @relation(fields: [parentId], references: [id])
+  parent    Parent   @relation(fields: [parentId], references: [id])
   parentId  Int
-  student   Student @relation(fields: [studentId], references: [id])
+  student   Student  @relation(fields: [studentId], references: [id])
   studentId Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([parentId, studentId])
+}
+
+model Attendace {
+  id        Int      @id @default(autoincrement())
+  student   Student  @relation(fields: [studentId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+  studentId Int
+  userId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

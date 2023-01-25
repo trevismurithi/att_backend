@@ -1,0 +1,34 @@
+type Query {
+    users: [User]
+    authUser(account: UserAuth!): User
+    userById(id: Int!): User
+}
+
+type Mutation {
+    createUser(account: UserInput): User
+    createAttendace(id: Int!, studentId: Int): User
+}
+
+type User {
+    id: Int
+    username: String
+    email: String
+    role: String
+    birthday: String
+    class: String
+    createdAt: String
+}
+
+input UserInput {
+    username: String
+    email: String
+    role: String
+    birthday: String
+    class: String
+    password: String
+}
+
+input UserAuth {
+    username: String
+    password: String
+}

@@ -5,19 +5,62 @@ async function createStudent (student: any) {
         data: {
             first_name: student.first_name,
             last_name: student.last_name,
-            age: student.age,
             birthday: student.birthday,
-            sex: student.sex,
-            parent: {
-                create: {
-                    first_name: student.parent.first_name,
-                    last_name: student.parent.last_name,
-                    age: student.parent.age,
-                    email: student.parent.email,
-                    sex: student.parent.sex,
-                    role: student.parent.role
-                }
-            }
+            sex: student.sex
+        },
+        include: {
+            parent: true
         }
     })
+    return createStudent
+}
+
+async function getAllStudents () {
+    const allStudents = await prisma.student.findMany({
+        include: {
+            parent: true,
+            relations: true
+        }
+    })
+    return allStudents
+}
+
+async function getStudentById (id: any) {
+    const student = await prisma.student.findUnique({
+        where: {
+            id
+        },
+        include: {
+            parent: true
+        }
+    })
+    return student
+}
+
+async function setStudentProfile (id: any, profile: any) {
+    const student = await prisma.student.update({
+        where: {
+            id
+        },
+        data: {
+            profile: {
+                create: {
+                    school_name: profile.school_name,
+                    school_class: profile.school_class,
+                    sunday_class: profile.sunday_class
+                }
+            }
+        },
+        include: {
+            profile: true
+        }
+    })
+    return student
+}
+
+export {
+    createStudent,
+    getAllStudents,
+    getStudentById,
+    setStudentProfile
 }

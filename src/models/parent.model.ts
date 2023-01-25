@@ -5,20 +5,18 @@ async function createParent(parent: any) {
         data: {
             first_name: parent.first_name,
             last_name: parent.last_name,
-            age: parent.age,
             email: parent.email,
             sex: parent.sex,
+            birthday: parent.birthday,
             role: parent.role,
             students: {
-                create: [
-                    {
-                        first_name: parent.student.first_name,
-                        last_name: parent.student.last_name,
-                        age: parent.student.age,
-                        birthday: parent.student.birthday,
-                        sex: parent.student.sex
-                    }
-                ]
+                create: {
+                    first_name: parent.student.first_name,
+                    last_name: parent.student.last_name,
+                    birthday: parent.student.birthday,
+                    sex: parent.student.sex
+
+                }
             }
         },
         include: {
@@ -55,7 +53,6 @@ async function setRelationship(relation: any) {
                             create: {
                                 first_name: relation.student.first_name,
                                 last_name: relation.student.last_name,
-                                age: relation.student.age,
                                 birthday: relation.student.birthday,
                                 sex: relation.student.sex
                             }   
