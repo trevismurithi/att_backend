@@ -1,5 +1,5 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, Role } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-export { prisma }
+export { prisma, Role }

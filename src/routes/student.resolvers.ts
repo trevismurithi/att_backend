@@ -5,21 +5,70 @@ import {
     setStudentProfile
 } from "../models/student.model"
 
+import { GraphQLError } from 'graphql'
 const resolvers = {
     Query: {
-        students: () => {
-            return getAllStudents()
+        students: async (_: any, __: any, context: any) => {
+            const students = await getAllStudents()
+            if (!context.user) {
+                throw new GraphQLError(
+                    "You are not authorized to perform this action",
+                    {
+                        extensions: {
+                            code: 'FORBIDDEN',
+                            http: { status: 401 }
+                        }
+                    }
+                );   
+            }
+            return students
         },
-        studentById: (_: any, args: any) => {
-            return getStudentById(args.id)
+        studentById: async (_: any, args: any, context: any) => {
+            const student = await getStudentById(args.id)
+            if (!context.user) {
+                throw new GraphQLError(
+                    "You are not authorized to perform this action",
+                    {
+                        extensions: {
+                            code: 'FORBIDDEN',
+                            http: { status: 401 }
+                        }
+                    }
+                );   
+            }
+            return student
         }
     },
     Mutation: {
-        createStudent: (_: any, args: any) => {
-            return createStudent(args.student)
+        createStudent: async (_: any, args: any, context: any) => {
+            const student = await createStudent(args.student)
+            if (!context.user) {
+                throw new GraphQLError(
+                    "You are not authorized to perform this action",
+                    {
+                        extensions: {
+                            code: 'FORBIDDEN',
+                            http: { status: 401 }
+                        }
+                    }
+                );   
+            }
+            return student
         },
-        createProfile (_: any, args: any) {
-            return setStudentProfile(args.id, args.profile)
+        createProfile: async (_: any, args: any, context: any) => {
+            const student = await setStudentProfile(args.id, args.profile)
+            if (!context.user) {
+                throw new GraphQLError(
+                    "You are not authorized to perform this action",
+                    {
+                        extensions: {
+                            code: 'FORBIDDEN',
+                            http: { status: 401 }
+                        }
+                    }
+                );   
+            }
+            return student
         }
     }
 }

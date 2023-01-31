@@ -13,8 +13,10 @@ datasource db {
 model User {
   id         Int         @id @default(autoincrement())
   username   String      @unique
+  first_name String      @db.VarChar(255)
+  last_name  String      @db.VarChar(255)
   email      String      @unique
-  role       String
+  role       Role        @default(TEACHER)
   birthday   DateTime
   class      String?
   password   String
@@ -43,9 +45,9 @@ model Parent {
   first_name String         @db.VarChar(255)
   last_name  String         @db.VarChar(255)
   email      String         @unique @db.VarChar(255)
-  birthday   DateTime
   sex        String
-  role       String
+  role       Role           @default(PARENT)
+  password   String?
   students   Student[]
   relations  Relationship[]
   profile    ParentProfile?
@@ -55,6 +57,7 @@ model Parent {
 
 model ParentProfile {
   id        Int      @id @default(autoincrement())
+  birthday  DateTime
   phone     String   @unique @db.VarChar(255)
   location  String   @db.VarChar(255)
   parent    Parent   @relation(fields: [parentId], references: [id])
@@ -96,4 +99,10 @@ model Attendace {
   userId    Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  ADMIN
+  PARENT
+  TEACHER
 }

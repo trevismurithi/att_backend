@@ -6,7 +6,7 @@ async function createStudent (student: any) {
             first_name: student.first_name,
             last_name: student.last_name,
             birthday: student.birthday,
-            sex: student.sex
+            sex: student.sex,
         },
         include: {
             parent: true

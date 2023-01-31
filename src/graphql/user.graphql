@@ -1,6 +1,6 @@
 type Query {
     users: [User]
-    authUser(account: UserAuth!): User
+    authUser(account: UserAuth!): IsUser
     userById(id: Int!): User
 }
 
@@ -9,9 +9,16 @@ type Mutation {
     createAttendace(id: Int!, studentId: Int): User
 }
 
+type IsUser {
+    user: User
+    token: String
+}
+
 type User {
     id: Int
     username: String
+    first_name: String
+    last_name: String
     email: String
     role: String
     birthday: String
@@ -21,8 +28,9 @@ type User {
 
 input UserInput {
     username: String
+    first_name: String
+    last_name: String
     email: String
-    role: String
     birthday: String
     class: String
     password: String

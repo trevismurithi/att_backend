@@ -4,6 +4,9 @@
   "description": "",
   "main": "build/server.js",
   "type": "commonjs",
+  "prisma": {
+    "seed": "ts-node src/seed/seed.ts"
+  },
   "scripts": {
     "watch": "npx nodemon",
     "start": "npm run build && npm run copy-files && node build/server.js",
@@ -15,6 +18,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@faker-js/faker": "^7.6.0",
     "@types/node": "^18.11.18",
     "nodemon": "^2.0.20",
     "prisma": "^4.9.0",
@@ -28,7 +32,14 @@
     "@graphql-tools/merge": "^8.3.15",
     "@graphql-tools/schema": "^9.0.13",
     "@prisma/client": "^4.9.0",
+    "@types/cors": "^2.8.13",
+    "@types/jsonwebtoken": "^9.0.1",
+    "@types/nodemailer": "^6.4.7",
+    "body-parser": "^1.20.1",
+    "dotenv": "^16.0.3",
     "express": "^4.18.2",
-    "graphql": "^16.6.0"
+    "graphql": "^16.6.0",
+    "jsonwebtoken": "^9.0.0",
+    "nodemailer": "^6.9.1"
   }
 }

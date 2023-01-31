@@ -7,7 +7,6 @@ async function createParent(parent: any) {
             last_name: parent.last_name,
             email: parent.email,
             sex: parent.sex,
-            birthday: parent.birthday,
             role: parent.role,
             students: {
                 create: {

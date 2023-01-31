@@ -1,10 +1,37 @@
 import { ApolloServer } from '@apollo/server'
 import { makeExecutableSchema } from '@graphql-tools/schema'
+import { expressMiddleware } from '@apollo/server/express4'
+import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer'
+import express from 'express'
+import bodyParser from 'body-parser'
+import cors from 'cors'
+import http from 'http'
 import { loadFilesSync } from '@graphql-tools/load-files'
 import path from 'path'
-import { startStandaloneServer } from '@apollo/server/standalone'
+import { verifyUser } from './services/jwt'
+import { main as mailer } from './services/mailer'
 
-const PORT = 3000
+
+
+// define contexts interface etc
+interface MyContext {
+    token?: String
+}
+
+interface tokenUser {
+    id: Number,
+    username: String
+}
+
+// Required logic for intergrating with express
+const app = express()
+
+// Our httpServer handles incoming requests to our Express app.
+// Below, we tell Apollo Server to drain this httpServer
+// enabling our servers to shut down gracefully
+const httpServer = http.createServer(app)
+
+const PORT: any = process.env.PORT || 3000
 // load the schemas
 
 const typeDefsArray = loadFilesSync(path.join(__dirname, 'graphql'), {
@@ -17,20 +44,56 @@ const resolversArray = loadFilesSync(path.join(__dirname, 'routes'), {
 })
 
 
+app.post('/email', async (req, res) => {
+    await mailer().catch(console.log)
+    res.send('hopefully sent')
+})
+
 async function main () {
     const schema = makeExecutableSchema({
         typeDefs: typeDefsArray,
         resolvers: resolversArray
     })
-    const server: any = new ApolloServer({
-        schema
+    const server = new ApolloServer<MyContext>({
+        schema,
+        plugins: [ApolloServerPluginDrainHttpServer({ httpServer })]
     })
+    // Ensure we wait for our server to start
+    await server.start()
 
-    const { url } = await startStandaloneServer(server, {
-        listen: { port: PORT }
-    })
+    // Set up our Express middleware to handle CORS, body parsing,
+    // and our expressMiddleware function
+    app.use(
+        '/',
+        cors<cors.CorsRequest>({
+            origin: 'https://google.com'
+        }),
+        // 50mb is the limit that startStandaloneServer uses, 
+        // but you may configure this to suit your needs
+        bodyParser.json({ limit: '50mb' }),
+        // expressMiddleware accepts the same arguments:
+        // an Apollo Server instance and optional configuration options
+        expressMiddleware(server, {
+            context: async ({ req }) => {
+                let token: String = ''
+                if (req.headers.authorization) {
+                    token = req.headers.authorization.split(' ')[1]
+                }
+                if (verifyUser(token) == undefined) {
+                    return {user: null}
+                }
+                // get the user if not null
+                const user: any = verifyUser(token)
+                return {
+                    user
+                }
+            }
+        })
+    )
 
-    console.log(`🚀  Server ready at: ${url}`);
+    // Modified server startup
+    await new Promise<void>((resolve) => httpServer.listen({ port: PORT }, resolve))
+    console.log(`🚀 Server ready at http://localhost:${PORT}/`);
 }
 
 main()

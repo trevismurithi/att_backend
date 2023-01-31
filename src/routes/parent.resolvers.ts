@@ -4,23 +4,72 @@ import {
     setRelationship,
     getParentById
 } from "../models/parent.model"
-import { prisma } from '../services/prisma'
+
+import { GraphQLError } from 'graphql'
 
 const resolvers = {
     Query: {
-        parents: () => {
-            return getAllParents()
+        parents: async (_: any, __: any, context: any) => {
+            const parents = await getAllParents()
+            if (!context.user) {
+                throw new GraphQLError(
+                    "You are not authorized to perform this action",
+                    {
+                        extensions: {
+                            code: 'FORBIDDEN',
+                            http: { status: 401 }
+                        }
+                    }
+                );   
+            }
+            return parents
         },
-        parentById: (_: any,args: any) => {
-            return getParentById(args.id)
+        parentById: async (_: any, args: any, context: any) => {
+            const parent = await getParentById(args.id)
+            if (!context.user) {
+                throw new GraphQLError(
+                    "You are not authorized to perform this action",
+                    {
+                        extensions: {
+                            code: 'FORBIDDEN',
+                            http: { status: 401 }
+                        }
+                    }
+                );   
+            }
+            return parent
         }
     },
     Mutation: {
-        createParent: async (_:any, args: any) => {
-            return addParent(args.parent)
+        createParent: async (_:any, args: any, context: any) => {
+            const parent = await addParent(args.parent)
+            if (!context.user) {
+                throw new GraphQLError(
+                    "You are not authorized to perform this action",
+                    {
+                        extensions: {
+                            code: 'FORBIDDEN',
+                            http: { status: 401 }
+                        }
+                    }
+                );   
+            }
+            return parent
         },
-        createRelationship: async (_:any, args: any) => {
-            return setRelationship(args.relation)
+        createRelationship: async (_:any, args: any, context: any) => {
+            const parent = await setRelationship(args.relation)
+            if (!context.user) {
+                throw new GraphQLError(
+                    "You are not authorized to perform this action",
+                    {
+                        extensions: {
+                            code: 'FORBIDDEN',
+                            http: { status: 401 }
+                        }
+                    }
+                );   
+            }
+            return parent
         }
     }
 }
