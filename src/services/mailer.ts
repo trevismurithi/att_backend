@@ -14,6 +14,9 @@ async function main() {
             user: 'user@jcceastlands.com', // generated ethereal user
             pass: '#1234Trevis5678', // generated ethereal password
         },
+        tls: {
+            rejectUnauthorized: false
+        }
     });
 
     // send mail with defined transport object
