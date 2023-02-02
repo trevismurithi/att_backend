@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer'
 
 // async..await is not allowed in global scope, must use a wrapper
-async function main() {
+async function sendMail(html: string) {
     // Generate test SMTP service account from ethereal.email
     // Only needed if you don't have a real mail account for testing
 
@@ -21,11 +21,11 @@ async function main() {
 
     // send mail with defined transport object
     let info = await transporter.sendMail({
-        from: '"Fred Foo 👻" <foo@example.com>', // sender address
+        from: '"Support Team 👻" <no-reply@jcceastlands-no-reply.com>', // sender address
         to: "trevismurithi@gmail.com", // list of receivers
         subject: "Hello ✔", // Subject line
         text: "Hello world?", // plain text body
-        html: "<b>Hello world?</b>", // html body
+        html // html body
     });
 
     console.log("Message sent: %s", info.messageId);
@@ -37,5 +37,5 @@ async function main() {
 }
 
 export {
-    main
+    sendMail
 }

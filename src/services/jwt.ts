@@ -3,10 +3,10 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
-function signUser (payload: Object) {
+function signUser(payload: Object, expiresIn: string) {
     const secret: any = process.env.SECRET_KEY
     return jwt.sign(payload, secret, {
-        expiresIn: '1h',
+        expiresIn
     })
 }
 
@@ -18,9 +18,16 @@ function verifyUser (token: any) {
         }
         return decoded
     })
+    return undefined
+}
+
+function compareDate (start: string, end: number): number {
+    const timeDiff = new Date(end).getTime() - new Date(start).getTime()
+    return new Date(timeDiff).getMinutes()
 }
 
 export {
     signUser,
-    verifyUser
+    verifyUser,
+    compareDate
 }

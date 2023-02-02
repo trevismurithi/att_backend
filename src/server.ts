@@ -4,12 +4,13 @@ import { expressMiddleware } from '@apollo/server/express4'
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer'
 import express from 'express'
 import bodyParser from 'body-parser'
+import cookiePaser from 'cookie-parser'
 import cors from 'cors'
 import http from 'http'
 import { loadFilesSync } from '@graphql-tools/load-files'
 import path from 'path'
 import { verifyUser } from './services/jwt'
-import { main as mailer } from './services/mailer'
+
 
 
 
@@ -31,7 +32,7 @@ const app = express()
 // enabling our servers to shut down gracefully
 const httpServer = http.createServer(app)
 
-const PORT: any = process.env.PORT || 3000
+const PORT: any = process.env.PORT || 4000
 // load the schemas
 
 const typeDefsArray = loadFilesSync(path.join(__dirname, 'graphql'), {
@@ -43,11 +44,6 @@ const resolversArray = loadFilesSync(path.join(__dirname, 'routes'), {
     extensions: ['resolvers.js']
 })
 
-
-app.post('/email', async (req, res) => {
-    await mailer().catch(console.log)
-    res.send('hopefully sent')
-})
 
 async function main () {
     const schema = makeExecutableSchema({
@@ -61,12 +57,14 @@ async function main () {
     // Ensure we wait for our server to start
     await server.start()
 
+    // express use cookie parser
+    app.use(cookiePaser())
     // Set up our Express middleware to handle CORS, body parsing,
     // and our expressMiddleware function
     app.use(
         '/',
         cors<cors.CorsRequest>({
-            origin: 'https://google.com'
+            origin: 'http://localhost:3000'
         }),
         // 50mb is the limit that startStandaloneServer uses, 
         // but you may configure this to suit your needs
@@ -74,7 +72,7 @@ async function main () {
         // expressMiddleware accepts the same arguments:
         // an Apollo Server instance and optional configuration options
         expressMiddleware(server, {
-            context: async ({ req }) => {
+            context: async ({ req, res }) => {
                 let token: String = ''
                 if (req.headers.authorization) {
                     token = req.headers.authorization.split(' ')[1]
@@ -85,7 +83,9 @@ async function main () {
                 // get the user if not null
                 const user: any = verifyUser(token)
                 return {
-                    user
+                    user,
+                    req,
+                    res
                 }
             }
         })

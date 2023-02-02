@@ -18,8 +18,10 @@ model User {
   email      String      @unique
   role       Role        @default(TEACHER)
   birthday   DateTime
-  class      String?
   password   String
+  class      String?
+  enabled    Boolean
+  token      Token?
   attendance Attendace[]
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
@@ -47,7 +49,6 @@ model Parent {
   email      String         @unique @db.VarChar(255)
   sex        String
   role       Role           @default(PARENT)
-  password   String?
   students   Student[]
   relations  Relationship[]
   profile    ParentProfile?
@@ -99,6 +100,15 @@ model Attendace {
   userId    Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Token {
+  id     Int    @id @default(autoincrement())
+  token  String
+  user   User  @relation(fields: [userId], references: [id])
+  userId Int @unique
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
 }
 
 enum Role {
