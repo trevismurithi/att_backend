@@ -33,7 +33,7 @@ const resolvers = {
             }
             return users
         },
-        authUser: async (_: any, args: any, context: any) => {
+        authUser: async (_: any, args: any, context: any) => {           
             const user = await getUser(args.account) 
             if (!user) {
                 throw new GraphQLError(
@@ -46,6 +46,7 @@ const resolvers = {
                     }
                 );   
             }
+            // TDOD: check if user is enabled
             // generate token and refresh token
             const token = signUser(
                 {id: user.id, username: user.username},
@@ -56,9 +57,10 @@ const resolvers = {
                 '1d'
             )
             // set cookie in browser
-            context.res.cookie('jwt', refreshToken, {
+            await context.res.cookie('jsonwebtoken', refreshToken, {
+                path: '/',
                 httpOnly: true,
-                sameSite: 'None',
+                SameSite: 'None',
                 maxAge: 24 * 3600 * 1000
 
             })
@@ -94,8 +96,9 @@ const resolvers = {
             return user
         },
         refreshToken: async (_: any, __: any, context: any) => {
+            console.log(context.req.cookies)
             // get tokens if available
-            if (!context.req.cookies || !context.req.cookies.jwt) {
+            if (!context.req.cookies || !context.req.cookies.jsonwebtoken) {
                 throw new GraphQLError(
                     'Authentication expired',
                     {
@@ -106,7 +109,7 @@ const resolvers = {
                     }
                 )
             }
-            const refreshToken = context.req.cookies.jwt
+            const refreshToken = context.req.cookies.jsonwebtoken
             const data: any = verifyUser(refreshToken)
             if (!data || !data.user) {
                 throw new GraphQLError(

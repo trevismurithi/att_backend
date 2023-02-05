@@ -2,7 +2,7 @@ type Query {
     users: [User]
     authUser(account: UserAuth!): IsUser
     userById(id: Int!): User
-    refreshToken(): Token
+    refreshToken:Token
 }
 
 type Mutation {

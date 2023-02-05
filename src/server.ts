@@ -27,6 +27,9 @@ interface tokenUser {
 // Required logic for intergrating with express
 const app = express()
 
+// express use cookie parser
+app.use(cookiePaser())
+
 // Our httpServer handles incoming requests to our Express app.
 // Below, we tell Apollo Server to drain this httpServer
 // enabling our servers to shut down gracefully
@@ -57,8 +60,6 @@ async function main () {
     // Ensure we wait for our server to start
     await server.start()
 
-    // express use cookie parser
-    app.use(cookiePaser())
     // Set up our Express middleware to handle CORS, body parsing,
     // and our expressMiddleware function
     app.use(
@@ -78,7 +79,11 @@ async function main () {
                     token = req.headers.authorization.split(' ')[1]
                 }
                 if (verifyUser(token) == undefined) {
-                    return {user: null}
+                    return {
+                        user: null,
+                        req,
+                        res
+                    }
                 }
                 // get the user if not null
                 const user: any = verifyUser(token)
