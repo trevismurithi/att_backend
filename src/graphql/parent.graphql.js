@@ -1,3 +1,4 @@
+module.exports = /* GraphQL */ `
 type Query {
     parents: [Parent]
     relations: [Relationship]
@@ -73,3 +74,4 @@ input ProfileInput {
     school_name: String!
     sunday_class: String!
 }
+`

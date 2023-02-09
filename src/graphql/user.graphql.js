@@ -1,3 +1,4 @@
+module.exports = /* GraphQL */ `
 type Query {
     users: [User]
     authUser(account: UserAuth!): IsUser
@@ -49,3 +50,4 @@ input UserAuth {
     username: String
     password: String
 }
+`

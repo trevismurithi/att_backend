@@ -11,17 +11,6 @@ import { loadFilesSync } from '@graphql-tools/load-files'
 import path from 'path'
 import { verifyUser } from './services/jwt'
 
-
-
-
-// define contexts interface etc
-
-
-interface tokenUser {
-    id: Number,
-    username: String
-}
-
 // Required logic for intergrating with express
 const app = express()
 
@@ -37,7 +26,7 @@ const PORT: any = process.env.PORT || 4000
 // load the schemas
 
 const typeDefsArray = loadFilesSync(path.join(__dirname, 'graphql'), {
-    extensions: ['graphql']
+    extensions: ['graphql.js']
 })
 
 

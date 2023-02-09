@@ -26,7 +26,7 @@ const httpServer = http_1.default.createServer(app);
 const PORT = process.env.PORT || 4000;
 // load the schemas
 const typeDefsArray = (0, load_files_1.loadFilesSync)(path_1.default.join(__dirname, 'graphql'), {
-    extensions: ['graphql']
+    extensions: ['graphql.js']
 });
 const resolversArray = (0, load_files_1.loadFilesSync)(path_1.default.join(__dirname, 'routes'), {
     extensions: ['resolvers.js']
