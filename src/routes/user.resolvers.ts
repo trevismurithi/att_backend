@@ -16,7 +16,7 @@ import crypto from 'crypto'
 import { hashing, compareHash } from '../services/hashing'
 import { sendMail } from '../services/mailer'
 
-export const resolvers = {
+export default{
     Query: {
         users: async (_: any, __: any, context: any) => {
             const users = await getUsers()

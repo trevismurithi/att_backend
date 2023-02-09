@@ -6,7 +6,7 @@ import {
 } from "../models/student.model"
 
 import { GraphQLError } from 'graphql'
-export const resolvers = {
+export default {
     Query: {
         students: async (_: any, __: any, context: any) => {
             const students = await getAllStudents()

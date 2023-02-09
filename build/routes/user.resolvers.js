@@ -3,14 +3,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.resolvers = void 0;
 const user_model_1 = require("../models/user.model");
 const graphql_1 = require("graphql");
 const jwt_1 = require("../services/jwt");
 const crypto_1 = __importDefault(require("crypto"));
 const hashing_1 = require("../services/hashing");
 const mailer_1 = require("../services/mailer");
-exports.resolvers = {
+exports.default = {
     Query: {
         users: async (_, __, context) => {
             const users = await (0, user_model_1.getUsers)();

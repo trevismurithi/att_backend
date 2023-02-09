@@ -1,9 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.resolvers = void 0;
 const student_model_1 = require("../models/student.model");
 const graphql_1 = require("graphql");
-exports.resolvers = {
+exports.default = {
     Query: {
         students: async (_, __, context) => {
             const students = await (0, student_model_1.getAllStudents)();

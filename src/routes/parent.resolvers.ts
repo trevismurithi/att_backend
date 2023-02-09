@@ -7,7 +7,7 @@ import {
 
 import { GraphQLError } from 'graphql'
 
-export const resolvers = {
+export default {
     Query: {
         parents: async (_: any, __: any, context: any) => {
             const parents = await getAllParents()

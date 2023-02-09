@@ -13,7 +13,6 @@ const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const cors_1 = __importDefault(require("cors"));
 const http_1 = __importDefault(require("http"));
 const load_files_1 = require("@graphql-tools/load-files");
-const standalone_1 = require("@apollo/server/standalone");
 const path_1 = __importDefault(require("path"));
 const jwt_1 = require("./services/jwt");
 // Required logic for intergrating with express
@@ -80,45 +79,4 @@ async function main() {
     await new Promise((resolve) => httpServer.listen({ port: PORT }, resolve));
     console.log(`🚀 Server ready at http://localhost:${PORT}/`);
 }
-async function standAlone() {
-    // Hardcoded data store
-    const books = [
-        {
-            title: 'The Awakening',
-            author: 'Kate Chopin',
-        },
-        {
-            title: 'City of Glass',
-            author: 'Paul Auster',
-        },
-    ];
-    // Schema definition
-    const typeDefs = `#graphql
-  type Book {
-    title: String
-    author: String
-  }
-
-  type Query {
-    books: [Book]
-  }
-`;
-    // Resolver map
-    const resolvers = {
-        Query: {
-            books() {
-                return books;
-            },
-        },
-    };
-    // Pass schema definition and resolvers to the
-    // ApolloServer constructor
-    const server = new server_1.ApolloServer({
-        typeDefs,
-        resolvers,
-    });
-    // Launch the server
-    const { url } = await (0, standalone_1.startStandaloneServer)(server);
-    console.log(`🚀 Server listening at: ${url}`);
-}
-standAlone();
+main();
