@@ -295,6 +295,4 @@ const resolvers = {
     }
 }
 
-export {
-    resolvers
-}
+export default resolvers

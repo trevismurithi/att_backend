@@ -2,6 +2,7 @@ import { ApolloServer } from '@apollo/server'
 import { makeExecutableSchema } from '@graphql-tools/schema'
 import { expressMiddleware } from '@apollo/server/express4'
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer'
+import { startStandaloneServer } from '@apollo/server/standalone';
 import express from 'express'
 import bodyParser from 'body-parser'
 import cookiePaser from 'cookie-parser'
@@ -65,7 +66,8 @@ async function main () {
     app.use(
         '/',
         cors<cors.CorsRequest>({
-            origin: 'http://localhost:3000'
+            origin: 'http://localhost:3000',
+            credentials:  true
         }),
         // 50mb is the limit that startStandaloneServer uses, 
         // but you may configure this to suit your needs
@@ -100,5 +102,6 @@ async function main () {
     await new Promise<void>((resolve) => httpServer.listen({ port: PORT }, resolve))
     console.log(`🚀 Server ready at http://localhost:${PORT}/`);
 }
+
 
 main()
