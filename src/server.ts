@@ -2,7 +2,6 @@ import { ApolloServer } from '@apollo/server'
 import { makeExecutableSchema } from '@graphql-tools/schema'
 import { expressMiddleware } from '@apollo/server/express4'
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer'
-import { startStandaloneServer } from '@apollo/server/standalone';
 import express from 'express'
 import bodyParser from 'body-parser'
 import cookiePaser from 'cookie-parser'
@@ -16,9 +15,7 @@ import { verifyUser } from './services/jwt'
 
 
 // define contexts interface etc
-interface MyContext {
-    token?: String
-}
+
 
 interface tokenUser {
     id: Number,
@@ -54,7 +51,7 @@ async function main () {
         typeDefs: typeDefsArray,
         resolvers: resolversArray
     })
-    const server = new ApolloServer<MyContext>({
+    const server = new ApolloServer({
         schema,
         plugins: [ApolloServerPluginDrainHttpServer({ httpServer })]
     })
