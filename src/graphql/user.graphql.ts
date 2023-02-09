@@ -1,4 +1,4 @@
-module.exports = /* GraphQL */ `
+export = /* GraphQL */ `
 type Query {
     users: [User]
     authUser(account: UserAuth!): IsUser

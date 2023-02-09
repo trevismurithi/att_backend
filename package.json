@@ -9,7 +9,7 @@
   },
   "scripts": {
     "watch": "npx nodemon",
-    "start": "npm run build && npm run copy-files && node build/server.js",
+    "start": "npm run build && node build/server.js",
     "init-start": "node build/server.js",
     "build": "rimraf ./build && tsc",
     "copy-files": "Xcopy /I src\\graphql  build\\graphql",

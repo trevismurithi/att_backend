@@ -1,4 +1,4 @@
-module.exports = /* GraphQL */ `
+export = /* GraphQL */ `
 type Query {
     parents: [Parent]
     relations: [Relationship]

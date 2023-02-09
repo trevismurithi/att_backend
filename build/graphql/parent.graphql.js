@@ -1,4 +1,5 @@
-module.exports = /* GraphQL */ `
+"use strict";
+module.exports = `
 type Query {
     parents: [Parent]
     relations: [Relationship]
@@ -74,4 +75,4 @@ input ProfileInput {
     school_name: String!
     sunday_class: String!
 }
-`
+`;
