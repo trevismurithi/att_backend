@@ -8,6 +8,7 @@ import cookiePaser from 'cookie-parser'
 import cors from 'cors'
 import http from 'http'
 import { loadFilesSync } from '@graphql-tools/load-files'
+import { mergeTypeDefs, mergeResolvers } from '@graphql-tools/merge'
 import path from 'path'
 import { verifyUser } from './services/jwt'
 
@@ -48,8 +49,8 @@ const resolversArray = loadFilesSync(path.join(__dirname, 'routes'), {
 
 async function main () {
     const schema = makeExecutableSchema({
-        typeDefs: typeDefsArray,
-        resolvers: resolversArray
+        typeDefs: mergeTypeDefs(typeDefsArray),
+        resolvers: mergeResolvers(resolversArray)
     })
     const server = new ApolloServer({
         schema,

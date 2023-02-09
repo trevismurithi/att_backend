@@ -13,6 +13,7 @@ const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const cors_1 = __importDefault(require("cors"));
 const http_1 = __importDefault(require("http"));
 const load_files_1 = require("@graphql-tools/load-files");
+const merge_1 = require("@graphql-tools/merge");
 const path_1 = __importDefault(require("path"));
 const jwt_1 = require("./services/jwt");
 // Required logic for intergrating with express
@@ -33,8 +34,8 @@ const resolversArray = (0, load_files_1.loadFilesSync)(path_1.default.join(__dir
 });
 async function main() {
     const schema = (0, schema_1.makeExecutableSchema)({
-        typeDefs: typeDefsArray,
-        resolvers: resolversArray
+        typeDefs: (0, merge_1.mergeTypeDefs)(typeDefsArray),
+        resolvers: (0, merge_1.mergeResolvers)(resolversArray)
     });
     const server = new server_1.ApolloServer({
         schema,
