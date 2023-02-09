@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const server_1 = require("@apollo/server");
+const schema_1 = require("@graphql-tools/schema");
 const express4_1 = require("@apollo/server/express4");
 const drainHttpServer_1 = require("@apollo/server/plugin/drainHttpServer");
 const express_1 = __importDefault(require("express"));
@@ -12,7 +13,7 @@ const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const cors_1 = __importDefault(require("cors"));
 const http_1 = __importDefault(require("http"));
 const load_files_1 = require("@graphql-tools/load-files");
-const merge_1 = require("@graphql-tools/merge");
+const standalone_1 = require("@apollo/server/standalone");
 const path_1 = __importDefault(require("path"));
 const jwt_1 = require("./services/jwt");
 // Required logic for intergrating with express
@@ -32,13 +33,12 @@ const resolversArray = (0, load_files_1.loadFilesSync)(path_1.default.join(__dir
     extensions: ['resolvers.js']
 });
 async function main() {
-    // const schema = makeExecutableSchema({
-    //     typeDefs: mergeTypeDefs(typeDefsArray),
-    //     resolvers: mergeResolvers(resolversArray)
-    // })
+    const schema = (0, schema_1.makeExecutableSchema)({
+        typeDefs: typeDefsArray,
+        resolvers: resolversArray
+    });
     const server = new server_1.ApolloServer({
-        typeDefs: (0, merge_1.mergeTypeDefs)(typeDefsArray),
-        resolvers: (0, merge_1.mergeResolvers)(resolversArray),
+        schema,
         plugins: [(0, drainHttpServer_1.ApolloServerPluginDrainHttpServer)({ httpServer })]
     });
     // Ensure we wait for our server to start
@@ -80,4 +80,45 @@ async function main() {
     await new Promise((resolve) => httpServer.listen({ port: PORT }, resolve));
     console.log(`🚀 Server ready at http://localhost:${PORT}/`);
 }
-main();
+async function standAlone() {
+    // Hardcoded data store
+    const books = [
+        {
+            title: 'The Awakening',
+            author: 'Kate Chopin',
+        },
+        {
+            title: 'City of Glass',
+            author: 'Paul Auster',
+        },
+    ];
+    // Schema definition
+    const typeDefs = `#graphql
+  type Book {
+    title: String
+    author: String
+  }
+
+  type Query {
+    books: [Book]
+  }
+`;
+    // Resolver map
+    const resolvers = {
+        Query: {
+            books() {
+                return books;
+            },
+        },
+    };
+    // Pass schema definition and resolvers to the
+    // ApolloServer constructor
+    const server = new server_1.ApolloServer({
+        typeDefs,
+        resolvers,
+    });
+    // Launch the server
+    const { url } = await (0, standalone_1.startStandaloneServer)(server);
+    console.log(`🚀 Server listening at: ${url}`);
+}
+standAlone();
