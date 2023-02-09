@@ -48,12 +48,13 @@ const resolversArray = loadFilesSync(path.join(__dirname, 'routes'), {
 
 
 async function main () {
-    const schema = makeExecutableSchema({
-        typeDefs: mergeTypeDefs(typeDefsArray),
-        resolvers: mergeResolvers(resolversArray)
-    })
+    // const schema = makeExecutableSchema({
+    //     typeDefs: mergeTypeDefs(typeDefsArray),
+    //     resolvers: mergeResolvers(resolversArray)
+    // })
     const server = new ApolloServer({
-        schema,
+        typeDefs: mergeTypeDefs(typeDefsArray),
+        resolvers: mergeResolvers(resolversArray),
         plugins: [ApolloServerPluginDrainHttpServer({ httpServer })]
     })
     // Ensure we wait for our server to start

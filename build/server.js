@@ -4,7 +4,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const server_1 = require("@apollo/server");
-const schema_1 = require("@graphql-tools/schema");
 const express4_1 = require("@apollo/server/express4");
 const drainHttpServer_1 = require("@apollo/server/plugin/drainHttpServer");
 const express_1 = __importDefault(require("express"));
@@ -33,12 +32,13 @@ const resolversArray = (0, load_files_1.loadFilesSync)(path_1.default.join(__dir
     extensions: ['resolvers.js']
 });
 async function main() {
-    const schema = (0, schema_1.makeExecutableSchema)({
-        typeDefs: (0, merge_1.mergeTypeDefs)(typeDefsArray),
-        resolvers: (0, merge_1.mergeResolvers)(resolversArray)
-    });
+    // const schema = makeExecutableSchema({
+    //     typeDefs: mergeTypeDefs(typeDefsArray),
+    //     resolvers: mergeResolvers(resolversArray)
+    // })
     const server = new server_1.ApolloServer({
-        schema,
+        typeDefs: (0, merge_1.mergeTypeDefs)(typeDefsArray),
+        resolvers: (0, merge_1.mergeResolvers)(resolversArray),
         plugins: [(0, drainHttpServer_1.ApolloServerPluginDrainHttpServer)({ httpServer })]
     });
     // Ensure we wait for our server to start
