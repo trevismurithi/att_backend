@@ -112,7 +112,6 @@ export default{
             }
             const refreshToken = context.req.cookies.jsonwebtoken
             const data: any = verifyUser(refreshToken)
-            console.log('--data--', data);
             
             if (!data || !data.username) {
                 throw new GraphQLError(
@@ -126,7 +125,7 @@ export default{
                 )
             }
             // get user and confirm user
-            const user: any = await getUserById(data.user.id)
+            const user: any = await getUserById(data.id)
             if (!user) {
                 throw new GraphQLError(
                     'Authentication expired: user not found',
