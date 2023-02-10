@@ -10,7 +10,7 @@
   "scripts": {
     "watch": "npx nodemon",
     "start": "npm run build && node build/server.js",
-    "init-start": "node build/server.js",
+    "init-start": "npx prisma migrate --name init && node build/server.js",
     "build": "rimraf ./build && tsc",
     "copy-files": "Xcopy /I src\\graphql  build\\graphql",
     "test": "echo \"Error: no test specified\" && exit 1"
