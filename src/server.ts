@@ -4,7 +4,7 @@ import { expressMiddleware } from '@apollo/server/express4'
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer'
 import express from 'express'
 import bodyParser from 'body-parser'
-import cookiePaser from 'cookie-parser'
+import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import http from 'http'
 import { loadFilesSync } from '@graphql-tools/load-files'
@@ -15,7 +15,7 @@ import { verifyUser } from './services/jwt'
 const app = express()
 
 // express use cookie parser
-app.use(cookiePaser())
+app.use(cookieParser())
 
 // Our httpServer handles incoming requests to our Express app.
 // Below, we tell Apollo Server to drain this httpServer
@@ -63,8 +63,6 @@ async function main () {
         expressMiddleware(server, {
             context: async ({ req, res }) => {
                 let token: String = ''
-                console.log(req.cookies);
-                
                 if (req.headers.authorization) {
                     token = req.headers.authorization.split(' ')[1]
                 }
