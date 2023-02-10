@@ -12,10 +12,7 @@ import path from 'path'
 import { verifyUser } from './services/jwt'
 
 // Required logic for intergrating with express
-const app = express()
-
-// express use cookie parser
-app.use(cookieParser())
+var app = express()
 
 // Our httpServer handles incoming requests to our Express app.
 // Below, we tell Apollo Server to drain this httpServer
@@ -55,6 +52,7 @@ async function main () {
             origin: 'http://localhost:3000',
             credentials:  true
         }),
+        cookieParser(),
         // 50mb is the limit that startStandaloneServer uses, 
         // but you may configure this to suit your needs
         bodyParser.json({ limit: '50mb' }),
