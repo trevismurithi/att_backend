@@ -60,7 +60,7 @@ export default{
             await context.res.cookie('jsonwebtoken', refreshToken, {
                 path: '/',
                 httpOnly: true,
-                sameSite: 'None',
+                sameSite: 'Secure',
                 maxAge: 24 * 3600 * 1000
 
             })
