@@ -63,6 +63,8 @@ async function main () {
         expressMiddleware(server, {
             context: async ({ req, res }) => {
                 let token: String = ''
+                console.log(req.cookies);
+                
                 if (req.headers.authorization) {
                     token = req.headers.authorization.split(' ')[1]
                 }
