@@ -97,7 +97,7 @@ export default{
             return user
         },
         refreshToken: async (_: any, __: any, context: any) => {
-            console.log(context.req.cookies)
+            console.dir(context.req, {depth: null})
             // get tokens if available
             if (!context.req.cookies || !context.req.cookies.jsonwebtoken) {
                 throw new GraphQLError(
