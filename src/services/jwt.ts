@@ -12,7 +12,11 @@ function signUser(payload: Object, expiresIn: string) {
 
 function verifyUser (token: any) {
     const secret: any = process.env.SECRET_KEY
-    return jwt.verify(token, secret)
+    try {
+        return jwt.verify(token, secret)
+    } catch (error) {
+        return {}
+    }
 }
 
 function compareDate (start: string, end: number): number {
