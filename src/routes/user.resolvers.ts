@@ -112,7 +112,7 @@ export default{
             }
             const refreshToken = context.req.cookies.jsonwebtoken
             const data: any = verifyUser(refreshToken)
-            if (!data || !data.user) {
+            if (!data || !data.username) {
                 throw new GraphQLError(
                     'Authentication expired: token denied',
                     {
