@@ -12,13 +12,7 @@ function signUser(payload: Object, expiresIn: string) {
 
 function verifyUser (token: any) {
     const secret: any = process.env.SECRET_KEY
-    jwt.verify(token, secret, function (err: any, decoded: any) {
-        if (err) {
-            return undefined
-        }
-        return decoded
-    })
-    return undefined
+    return jwt.verify(token, secret)
 }
 
 function compareDate (start: string, end: number): number {
