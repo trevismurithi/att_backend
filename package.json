@@ -1,0 +1,52 @@
+{
+  "name": "attendance",
+  "version": "1.0.0",
+  "description": "",
+  "main": "build/server.js",
+  "type": "commonjs",
+  "prisma": {
+    "seed": "ts-node src/seed/seed.ts"
+  },
+  "scripts": {
+    "watch": "npx nodemon",
+    "start": "npm run build && node build/server.js",
+    "init-start": "npx prisma migrate deploy && node build/server.js",
+    "build": "rimraf ./build && tsc",
+    "copy-files": "Xcopy /I src\\graphql  build\\graphql",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@faker-js/faker": "^7.6.0",
+    "@types/bcrypt": "^5.0.0",
+    "@types/cookie-parser": "^1.4.3",
+    "@types/cors": "^2.8.13",
+    "@types/jsonwebtoken": "^9.0.1",
+    "@types/node": "^18.11.18",
+    "@types/nodemailer": "^6.4.7",
+    "nodemon": "^2.0.20",
+    "prisma": "^4.9.0",
+    "rimraf": "^3.0.2",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "@apollo/server": "^4.3.0",
+    "@graphql-tools/load-files": "^6.6.1",
+    "@graphql-tools/merge": "^8.3.15",
+    "@graphql-tools/schema": "^9.0.13",
+    "@prisma/client": "^4.9.0",
+    "africastalking": "^0.6.3",
+    "bcrypt": "^5.1.0",
+    "body-parser": "^1.20.1",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "graphql": "^16.6.0",
+    "jsonwebtoken": "^9.0.0",
+    "nodemailer": "^6.9.1"
+  }
+}

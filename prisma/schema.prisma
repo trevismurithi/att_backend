@@ -1,0 +1,136 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int         @id @default(autoincrement())
+  username   String      @unique
+  first_name String      @db.VarChar(255)
+  last_name  String      @db.VarChar(255)
+  email      String      @unique
+  role       Role        @default(TEACHER)
+  birthday   DateTime
+  password   String
+  class      String?
+  enabled    Boolean
+  token      Token?
+  attendance Attendace[]
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
+
+model Student {
+  id         Int            @id @default(autoincrement())
+  first_name String         @db.VarChar(255)
+  last_name  String         @db.VarChar(255)
+  birthday   DateTime
+  sex        String
+  profile    Profile?
+  parent     Parent?        @relation(fields: [parentId], references: [id])
+  parentId   Int
+  booking    Booking?
+  relations  Relationship[]
+  attendance Attendace[]
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+}
+
+model Parent {
+  id         Int            @id @default(autoincrement())
+  first_name String         @db.VarChar(255)
+  last_name  String         @db.VarChar(255)
+  email      String         @unique @db.VarChar(255)
+  sex        String
+  role       Role           @default(PARENT)
+  students   Student[]
+  relations  Relationship[]
+  profile    ParentProfile?
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+}
+
+model ParentProfile {
+  id        Int      @id @default(autoincrement())
+  birthday  DateTime
+  phone     String   @unique @db.VarChar(255)
+  location  String   @db.VarChar(255)
+  parent    Parent   @relation(fields: [parentId], references: [id])
+  parentId  Int      @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Profile {
+  id           Int      @id @default(autoincrement())
+  school_name  String?  @db.VarChar(255)
+  school_class String?  @db.VarChar(255)
+  sunday_class String   @db.VarChar(255)
+  image        String?
+  student      Student  @relation(fields: [studentId], references: [id])
+  studentId    Int      @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Relationship {
+  id        Int      @id @default(autoincrement())
+  status    String
+  parent    Parent   @relation(fields: [parentId], references: [id])
+  parentId  Int
+  student   Student  @relation(fields: [studentId], references: [id])
+  studentId Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([parentId, studentId])
+}
+
+model Attendace {
+  id        Int      @id @default(autoincrement())
+  student   Student  @relation(fields: [studentId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+  studentId Int
+  userId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Token {
+  id        Int      @id @default(autoincrement())
+  token     String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int      @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Booking {
+  id        Int      @id @default(autoincrement())
+  from      DateTime
+  to        DateTime
+  status    Status
+  student   Student  @relation(fields: [studentId], references: [id])
+  studentId Int      @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  ADMIN
+  PARENT
+  TEACHER
+}
+
+enum Status {
+  PICK
+  ALIGHT
+  FIXED
+}
