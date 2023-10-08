@@ -97,6 +97,9 @@ async function getAllParents(page:number = 1, take: number = 4) {
             students: true,
             relations: true
         },
+        orderBy: {
+            updatedAt: 'desc'
+        },
         skip,
         take
     })
@@ -136,7 +139,27 @@ async function updateParent (id: number, data: any) {
         where: {
             id
         },
-        data,
+        data: {
+            first_name: data.first_name,
+            last_name: data.last_name,
+            email: data.email,
+            sex: data.sex,
+            role: data.role,
+            profile: {
+                upsert: {
+                    create: {
+                        birthday: data.profile.birthday,
+                        phone: data.profile.phone,
+                        location: data.profile.location
+                    },
+                    update: {
+                        birthday: data.profile.birthday,
+                        phone: data.profile.phone,
+                        location: data.profile.location
+                    }
+                }
+            }
+        },
         include: {
             profile: true,
             students: true,

@@ -107,7 +107,7 @@ async function setStudentBooking (id: number, booking: any) {
     const student = await prisma.student.update({
         where: {
             id
-        },
+    },
         data: {
             booking: {
                 create: booking
