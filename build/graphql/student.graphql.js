@@ -1,9 +1,9 @@
 "use strict";
 module.exports = `
 type Query {
-    students: [Student],
+    students (page:Int!, take: Int!): StudentLimit,
     studentById(id: Int!): Student
-    studentBooking: [Student]
+    studentBooking (page:Int!, take: Int!): StudentLimit
     studentByName(name: String): [Student]
 }
 
@@ -25,6 +25,14 @@ input StudentInput {
     sunday_class: String!
     status: String!
     parentId: Int
+    relationsId: Int
+}
+
+type StudentLimit {
+    allStudents: [Student]
+    count: Int
+    page: Int
+    take: Int
 }
 
 type Student {

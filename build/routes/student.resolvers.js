@@ -5,7 +5,7 @@ const sms_1 = require("../services/sms");
 const graphql_1 = require("graphql");
 exports.default = {
     Query: {
-        students: async (_, __, context) => {
+        students: async (_, args, context) => {
             if (!context.user) {
                 throw new graphql_1.GraphQLError("You are not authorized to perform this action", {
                     extensions: {
@@ -14,10 +14,10 @@ exports.default = {
                     }
                 });
             }
-            const students = await (0, student_model_1.getAllStudents)();
-            return students;
+            const studentLimit = await (0, student_model_1.getAllStudents)(args.page, args.take);
+            return studentLimit;
         },
-        studentBooking: async (_, __, context) => {
+        studentBooking: async (_, args, context) => {
             if (!context.user) {
                 throw new graphql_1.GraphQLError("You are not authorized to perform this action", {
                     extensions: {
@@ -26,7 +26,7 @@ exports.default = {
                     }
                 });
             }
-            const students = await (0, student_model_1.getFilterStudents)();
+            const students = await (0, student_model_1.getFilterStudents)(args.page, args.take);
             return students;
         },
         studentById: async (_, args, context) => {

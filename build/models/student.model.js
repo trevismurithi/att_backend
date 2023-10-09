@@ -13,6 +13,23 @@ async function createStudent(student) {
                 connect: {
                     id: student.parentId
                 }
+            },
+            relations: {
+                create: {
+                    status: student.status,
+                    parent: {
+                        connect: {
+                            id: student.parentId
+                        }
+                    }
+                }
+            },
+            profile: {
+                create: {
+                    school_class: student.school_class,
+                    school_name: student.school_name,
+                    sunday_class: student.sunday_class
+                }
             }
         },
         include: {
@@ -23,18 +40,26 @@ async function createStudent(student) {
     return createStudent;
 }
 exports.createStudent = createStudent;
-async function getAllStudents() {
+async function getAllStudents(page = 1, take = 4) {
+    const skip = (page - 1) * take + 1;
     const allStudents = await prisma_1.prisma.student.findMany({
         include: {
             parent: true,
             profile: true,
             relations: true
-        }
+        },
+        orderBy: {
+            updatedAt: 'desc'
+        },
+        skip,
+        take
     });
-    return allStudents;
+    const count = await prisma_1.prisma.student.count();
+    return { allStudents, count, page, take };
 }
 exports.getAllStudents = getAllStudents;
-async function getFilterStudents() {
+async function getFilterStudents(page = 1, take = 4) {
+    const skip = (page - 1) * take + 1;
     const allStudents = await prisma_1.prisma.student.findMany({
         where: {
             booking: {
@@ -46,12 +71,21 @@ async function getFilterStudents() {
             parent: true,
             profile: true,
             relations: true
-        }
+        },
+        skip,
+        take
     });
-    return allStudents;
+    const count = await prisma_1.prisma.student.count({
+        where: {
+            booking: {
+                isNot: null
+            }
+        },
+    });
+    return { allStudents, count, page, take };
 }
 exports.getFilterStudents = getFilterStudents;
-async function getFilteredSearchStudents(word) {
+async function getFilteredSearchStudents(word, take = 10) {
     const allStudents = await prisma_1.prisma.student.findMany({
         where: {
             OR: [
@@ -68,7 +102,13 @@ async function getFilteredSearchStudents(word) {
                     }
                 }
             ]
-        }
+        },
+        include: {
+            parent: true,
+            profile: true,
+            relations: true
+        },
+        take
     });
     return allStudents;
 }
@@ -142,10 +182,50 @@ async function updateStudent(id, data) {
         where: {
             id
         },
-        data,
+        data: {
+            birthday: data.birthday,
+            first_name: data.first_name,
+            last_name: data.last_name,
+            sex: data.sex,
+            profile: {
+                upsert: {
+                    create: {
+                        school_class: data.school_class,
+                        sunday_class: data.sunday_class,
+                        school_name: data.school_name,
+                        image: 'null'
+                    },
+                    update: {
+                        school_class: data.school_class,
+                        sunday_class: data.sunday_class,
+                        school_name: data.school_name,
+                    }
+                }
+            },
+            relations: {
+                upsert: {
+                    create: {
+                        status: data.status,
+                        parent: {
+                            connect: {
+                                id: data.parentId
+                            }
+                        }
+                    },
+                    where: {
+                        id: data.relationsId
+                    },
+                    update: {
+                        status: data.status
+                    }
+                }
+            }
+        },
         include: {
             booking: true,
-            profile: true
+            profile: true,
+            parent: true,
+            relations: true
         }
     });
     return student;

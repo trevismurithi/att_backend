@@ -15,7 +15,7 @@ import { sendSMS } from '../services/sms'
 import { GraphQLError } from 'graphql'
 export default {
     Query: {
-        students: async (_: any, __: any, context: any) => {
+        students: async (_: any, args: any, context: any) => {
             if (!context.user) {
                 throw new GraphQLError(
                     "You are not authorized to perform this action",
@@ -27,10 +27,10 @@ export default {
                     }
                 );   
             }
-            const students = await getAllStudents()
-            return students
+            const studentLimit = await getAllStudents(args.page, args.take)
+            return studentLimit
         },
-        studentBooking: async (_: any, __: any, context: any) => {
+        studentBooking: async (_: any, args: any, context: any) => {
             if (!context.user) {
                 throw new GraphQLError(
                     "You are not authorized to perform this action",
@@ -42,7 +42,7 @@ export default {
                     }
                 );   
             }
-            const students = await getFilterStudents()
+            const students = await getFilterStudents(args.page, args.take)
             return students
         },
         studentById: async (_: any, args: any, context: any) => {

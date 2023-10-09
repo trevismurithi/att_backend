@@ -90,7 +90,7 @@ async function setRelationship(relation: any) {
 }
 
 async function getAllParents(page:number = 1, take: number = 4) {
-    const skip = (page - 1) * (take + 1)
+    const skip = (page - 1) * take + 1
     const allParents = await prisma.parent.findMany({
         include: {
             profile: true,
@@ -107,7 +107,7 @@ async function getAllParents(page:number = 1, take: number = 4) {
     return {allParents, count, page, take}
 }
 
-async function getFilteredParents (word: string) {
+async function getFilteredParents (word: string, take: number = 10) {
     const allParents = await prisma.parent.findMany({
         where: {
             OR: [
@@ -129,7 +129,8 @@ async function getFilteredParents (word: string) {
             profile: true,
             students: true,
             relations: true
-        }
+        },
+        take
     })
     return allParents
 }

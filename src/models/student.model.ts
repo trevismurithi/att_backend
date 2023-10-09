@@ -11,6 +11,23 @@ async function createStudent (student: any) {
                 connect: {
                     id: student.parentId
                 }
+            },
+            relations: {
+                create: {
+                    status: student.status,
+                    parent: {
+                        connect: {
+                            id: student.parentId
+                        }
+                    }
+                }
+            },
+            profile: {
+                create: {
+                    school_class: student.school_class,
+                    school_name: student.school_name,
+                    sunday_class: student.sunday_class
+                }
             }
         },
         include: {
@@ -21,17 +38,25 @@ async function createStudent (student: any) {
     return createStudent
 }
 
-async function getAllStudents () {
+async function getAllStudents (page:number = 1, take: number = 4) {
+    const skip = (page - 1) * take + 1
     const allStudents = await prisma.student.findMany({
         include: {
             parent: true,
             profile: true,
             relations: true
-        }
+        },
+        orderBy: {
+            updatedAt: 'desc'
+        },
+        skip,
+        take
     })
-    return allStudents
+    const count = await prisma.student.count()
+    return {allStudents, count, page, take}
 }
-async function getFilterStudents () {
+async function getFilterStudents (page:number = 1, take: number = 4) {
+    const skip = (page - 1) * take + 1
     const allStudents = await prisma.student.findMany({
         where: {
             booking: {
@@ -43,12 +68,21 @@ async function getFilterStudents () {
             parent: true,
             profile: true,
             relations: true
-        }
+        },
+        skip,
+        take
     })
-    return allStudents
+    const count = await prisma.student.count({
+        where: {
+            booking: {
+                isNot: null
+            }
+        },
+    })
+    return {allStudents, count, page, take}
 }
 
-async function getFilteredSearchStudents (word: string) {
+async function getFilteredSearchStudents (word: string, take: number = 10) {
     const allStudents = await prisma.student.findMany({
         where: {
             OR: [
@@ -65,7 +99,13 @@ async function getFilteredSearchStudents (word: string) {
                     }
                 }
             ]
-        }
+        },
+        include: {
+            parent: true,
+            profile: true,
+            relations: true
+        },
+        take
     })
     return allStudents
 }
@@ -138,10 +178,50 @@ async function updateStudent (id: number, data: any) {
         where: {
             id
         },
-        data,
+        data: {
+            birthday: data.birthday,
+            first_name: data.first_name,
+            last_name: data.last_name,
+            sex: data.sex,
+            profile: {
+                upsert: {
+                    create: {
+                        school_class: data.school_class,
+                        sunday_class: data.sunday_class,
+                        school_name: data.school_name,
+                        image: 'null'
+                    },
+                    update: {
+                        school_class: data.school_class,
+                        sunday_class: data.sunday_class,
+                        school_name: data.school_name,
+                    }
+                }
+            },
+            relations: {
+                upsert: {
+                    create: {
+                        status: data.status,
+                        parent: {
+                            connect: {
+                                id: data.parentId
+                            }
+                        }
+                    },
+                    where: {
+                        id: data.relationsId
+                    },
+                    update: {
+                        status: data.status
+                    }
+                }
+            }
+        },
         include: {
             booking: true,
-            profile: true
+            profile: true,
+            parent: true,
+            relations: true
         }
     })
     return student
