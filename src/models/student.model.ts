@@ -39,7 +39,7 @@ async function createStudent (student: any) {
 }
 
 async function getAllStudents (page:number = 1, take: number = 4) {
-    const skip = (page - 1) * take + 1
+    const skip = (page - 1) * take
     const allStudents = await prisma.student.findMany({
         include: {
             parent: true,
@@ -56,7 +56,7 @@ async function getAllStudents (page:number = 1, take: number = 4) {
     return {allStudents, count, page, take}
 }
 async function getFilterStudents (page:number = 1, take: number = 4) {
-    const skip = (page - 1) * take + 1
+    const skip = (page - 1) * take
     const allStudents = await prisma.student.findMany({
         where: {
             booking: {
@@ -81,7 +81,39 @@ async function getFilterStudents (page:number = 1, take: number = 4) {
     })
     return {allStudents, count, page, take}
 }
+async function getFilterStudentsBooking (word:string, take: number = 4) {
+    const allStudents = await prisma.student.findMany({
+        where: {
+            OR: [
+                {
+                    first_name: {
+                        startsWith: word,
+                        mode: 'insensitive'
+                    },
+                    booking: {
+                        isNot: null
+                    }
+                },
+                {
+                    last_name: {
+                        startsWith: word,
+                        mode: 'insensitive'
+                    },
+                    booking: {
+                        isNot: null
+                    }
+                }
+            ]
+        },
+        include: {
+            booking: true,
+            profile: true,
+        },
+        take
+    })
 
+    return allStudents
+}
 async function getFilteredSearchStudents (word: string, take: number = 10) {
     const allStudents = await prisma.student.findMany({
         where: {
@@ -235,5 +267,6 @@ export {
     getFilterStudents,
     getFilteredSearchStudents,
     updateStudentBooking,
-    updateStudent
+    updateStudent,
+    getFilterStudentsBooking
 }

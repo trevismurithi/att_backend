@@ -91,7 +91,7 @@ async function setRelationship(relation) {
 }
 exports.setRelationship = setRelationship;
 async function getAllParents(page = 1, take = 4) {
-    const skip = (page - 1) * take + 1;
+    const skip = (page - 1) * take;
     const allParents = await prisma_1.prisma.parent.findMany({
         include: {
             profile: true,

@@ -1,13 +1,12 @@
 import { 
     getUsers,
-    getUser,
-    getUserById,
+    getUserByField,
+    getUserBySearch,
     createUser as createNewUser,
     createAttendance,
     getTokenById,
     updateUser,
     deleteToken,
-    getUserByEmail,
     updateToken
 } from "../models/user.model"
 import { GraphQLError } from 'graphql'
@@ -18,7 +17,7 @@ import { sendMail } from '../services/mailer'
 
 export default{
     Query: {
-        users: async (_: any, __: any, context: any) => {
+        users: async (_: any, args: any, context: any) => {
             if (!context.user) {
                 throw new GraphQLError(
                     "You are not authorized to perform this action",
@@ -30,11 +29,11 @@ export default{
                     }
                     );   
             }
-            const users = await getUsers()
+            const users = await getUsers(args.page, args.take)
             return users
         },
         authUser: async (_: any, args: any, context: any) => {           
-            const user = await getUser(args.account) 
+            const user = await getUserByField({username: args.account.username}) 
             if (!user) {
                 throw new GraphQLError(
                     "User was not found",
@@ -71,18 +70,6 @@ export default{
             }
         },
         userById: async (_: any, args: any, context: any) => {
-            const user = await getUserById(args.id)
-            if (!user) {
-                throw new GraphQLError(
-                    "User was not found",
-                    {
-                        extensions: {
-                            code: 'FORBIDDEN',
-                            http: { status: 404 }
-                        }
-                    }
-                );   
-            }
             if (!context.user) {
                 throw new GraphQLError(
                     "You are not authorized to perform this action",
@@ -94,7 +81,34 @@ export default{
                     }
                 );   
             }
+            const user = await getUserByField({id: args.id})
+            if (!user) {
+                throw new GraphQLError(
+                    "User was not found",
+                    {
+                        extensions: {
+                            code: 'FORBIDDEN',
+                            http: { status: 404 }
+                        }
+                    }
+                );   
+            }
             return user
+        },
+        findUser: async (_: any, args: any, context: any) => {
+            if (!context.user) {
+                throw new GraphQLError(
+                    "You are not authorized to perform this action",
+                    {
+                        extensions: {
+                            code: 'FORBIDDEN',
+                            http: { status: 401 }
+                        }
+                    }
+                );   
+            }
+            const users = await getUserBySearch(args.name)
+            return users
         },
         refreshToken: async (_: any, __: any, context: any) => {
             console.dir(context.req.cookies, {depth: null})
@@ -125,7 +139,7 @@ export default{
                 )
             }
             // get user and confirm user
-            const user: any = await getUserById(data.id)
+            const user: any = await getUserByField({id: data.id})
             if (!user) {
                 throw new GraphQLError(
                     'Authentication expired: user not found',
@@ -204,7 +218,7 @@ export default{
         },
         forgotPassword: async (_: any, args: any) => {
             // create token or update
-            const user = await getUserByEmail(args.email)
+            const user = await getUserByField({email: args.email})
             if (!user) {
                 throw new GraphQLError(
                     'Invalid user email',
@@ -235,7 +249,7 @@ export default{
         },
         resetPassword: async (_: any, args: any) => {
             // validate user
-            const user = await getUserById(args.id)
+            const user = await getUserByField({id: args.id})
             if (!user) {
                 throw new GraphQLError(
                     'Invalid link provided',

@@ -90,7 +90,7 @@ async function setRelationship(relation: any) {
 }
 
 async function getAllParents(page:number = 1, take: number = 4) {
-    const skip = (page - 1) * take + 1
+    const skip = (page - 1) * take
     const allParents = await prisma.parent.findMany({
         include: {
             profile: true,

@@ -11,7 +11,7 @@ const hashing_1 = require("../services/hashing");
 const mailer_1 = require("../services/mailer");
 exports.default = {
     Query: {
-        users: async (_, __, context) => {
+        users: async (_, args, context) => {
             if (!context.user) {
                 throw new graphql_1.GraphQLError("You are not authorized to perform this action", {
                     extensions: {
@@ -20,11 +20,11 @@ exports.default = {
                     }
                 });
             }
-            const users = await (0, user_model_1.getUsers)();
+            const users = await (0, user_model_1.getUsers)(args.page, args.take);
             return users;
         },
         authUser: async (_, args, context) => {
-            const user = await (0, user_model_1.getUser)(args.account);
+            const user = await (0, user_model_1.getUserByField)({ username: args.account.username });
             if (!user) {
                 throw new graphql_1.GraphQLError("User was not found", {
                     extensions: {
@@ -51,15 +51,6 @@ exports.default = {
             };
         },
         userById: async (_, args, context) => {
-            const user = await (0, user_model_1.getUserById)(args.id);
-            if (!user) {
-                throw new graphql_1.GraphQLError("User was not found", {
-                    extensions: {
-                        code: 'FORBIDDEN',
-                        http: { status: 404 }
-                    }
-                });
-            }
             if (!context.user) {
                 throw new graphql_1.GraphQLError("You are not authorized to perform this action", {
                     extensions: {
@@ -68,7 +59,28 @@ exports.default = {
                     }
                 });
             }
+            const user = await (0, user_model_1.getUserByField)({ id: args.id });
+            if (!user) {
+                throw new graphql_1.GraphQLError("User was not found", {
+                    extensions: {
+                        code: 'FORBIDDEN',
+                        http: { status: 404 }
+                    }
+                });
+            }
             return user;
+        },
+        findUser: async (_, args, context) => {
+            if (!context.user) {
+                throw new graphql_1.GraphQLError("You are not authorized to perform this action", {
+                    extensions: {
+                        code: 'FORBIDDEN',
+                        http: { status: 401 }
+                    }
+                });
+            }
+            const users = await (0, user_model_1.getUserBySearch)(args.name);
+            return users;
         },
         refreshToken: async (_, __, context) => {
             console.dir(context.req.cookies, { depth: null });
@@ -92,7 +104,7 @@ exports.default = {
                 });
             }
             // get user and confirm user
-            const user = await (0, user_model_1.getUserById)(data.id);
+            const user = await (0, user_model_1.getUserByField)({ id: data.id });
             if (!user) {
                 throw new graphql_1.GraphQLError('Authentication expired: user not found', {
                     extensions: {
@@ -152,7 +164,7 @@ exports.default = {
         },
         forgotPassword: async (_, args) => {
             // create token or update
-            const user = await (0, user_model_1.getUserByEmail)(args.email);
+            const user = await (0, user_model_1.getUserByField)({ email: args.email });
             if (!user) {
                 throw new graphql_1.GraphQLError('Invalid user email', {
                     extensions: {
@@ -177,7 +189,7 @@ exports.default = {
         },
         resetPassword: async (_, args) => {
             // validate user
-            const user = await (0, user_model_1.getUserById)(args.id);
+            const user = await (0, user_model_1.getUserByField)({ id: args.id });
             if (!user) {
                 throw new graphql_1.GraphQLError('Invalid link provided', {
                     extensions: {

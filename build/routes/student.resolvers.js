@@ -41,6 +41,18 @@ exports.default = {
             const student = await (0, student_model_1.getStudentById)(args.id);
             return student;
         },
+        studentByBooking: async (_, args, context) => {
+            if (!context.user) {
+                throw new graphql_1.GraphQLError("You are not authorized to perform this action", {
+                    extensions: {
+                        code: 'FORBIDDEN',
+                        http: { status: 401 }
+                    }
+                });
+            }
+            const students = await (0, student_model_1.getFilterStudentsBooking)(args.name);
+            return students;
+        },
         studentByName: async (_, args, context) => {
             if (!context.user) {
                 throw new graphql_1.GraphQLError("You are not authorized to perform this action", {

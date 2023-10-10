@@ -5,6 +5,7 @@ type Query {
     studentById(id: Int!): Student
     studentBooking (page:Int!, take: Int!): StudentLimit
     studentByName(name: String): [Student]
+    studentByBooking(name: String): [Student]
 }
 
 type Mutation {

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateToken = exports.getUserByEmail = exports.updateUser = exports.getTokenById = exports.deleteToken = exports.createToken = exports.createAttendance = exports.getUserById = exports.getUser = exports.getUsers = exports.createUser = void 0;
+exports.updateToken = exports.updateUser = exports.getTokenById = exports.deleteToken = exports.createToken = exports.createAttendance = exports.getUserByField = exports.getUserBySearch = exports.getUsers = exports.createUser = void 0;
 const prisma_1 = require("../services/prisma");
 const hashing_1 = require("../services/hashing");
 async function createUser(account, crypted) {
@@ -24,41 +24,52 @@ async function createUser(account, crypted) {
     return userRole;
 }
 exports.createUser = createUser;
-async function getUsers() {
-    const users = await prisma_1.prisma.user.findMany();
-    return users;
+async function getUsers(page = 1, take = 4) {
+    const skip = (page - 1) * take;
+    const users = await prisma_1.prisma.user.findMany({
+        skip,
+        take
+    });
+    const count = await prisma_1.prisma.user.count();
+    return { users, count, page, take };
 }
 exports.getUsers = getUsers;
-async function getUserById(id) {
+async function getUserByField(field) {
     const userRole = await prisma_1.prisma.user.findUnique({
-        where: {
-            id
-        }
+        where: field
     });
     return userRole;
 }
-exports.getUserById = getUserById;
-async function getUserByEmail(email) {
-    const userRole = await prisma_1.prisma.user.findUnique({
+exports.getUserByField = getUserByField;
+async function getUserBySearch(word, take = 10) {
+    const users = await prisma_1.prisma.user.findMany({
         where: {
-            email
-        }
+            OR: [
+                {
+                    username: {
+                        startsWith: word,
+                        mode: 'insensitive'
+                    }
+                },
+                {
+                    first_name: {
+                        startsWith: word,
+                        mode: 'insensitive'
+                    }
+                },
+                {
+                    last_name: {
+                        startsWith: word,
+                        mode: 'insensitive'
+                    }
+                }
+            ]
+        },
+        take
     });
-    return userRole;
+    return users;
 }
-exports.getUserByEmail = getUserByEmail;
-async function getUser(account) {
-    const userRole = await prisma_1.prisma.user.findUnique({
-        where: {
-            username: account.username,
-        }
-    });
-    if (!(0, hashing_1.compareHash)(account.password, userRole?.password)) {
-        throw new Error("Invalid credentials");
-    }
-    return userRole;
-}
-exports.getUser = getUser;
+exports.getUserBySearch = getUserBySearch;
 async function createAttendance(id, studentId) {
     const present = await prisma_1.prisma.user.update({
         where: {

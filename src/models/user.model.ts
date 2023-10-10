@@ -23,39 +23,51 @@ async function createUser(account: any, crypted: string) {
     return userRole
 }
 
-async function getUsers () {
-    const users = await prisma.user.findMany()
+async function getUsers (page:number = 1, take: number = 4) {
+    const skip = (page - 1) * take
+    const users = await prisma.user.findMany({
+        skip,
+        take
+    })
+    const count = await prisma.user.count()
+    return {users, count, page, take}
+}
+
+async function getUserByField (field: any) {
+    const userRole = await prisma.user.findUnique({
+        where: field
+    })
+    return userRole
+}
+
+
+async function getUserBySearch (word: string, take: number = 10) {
+    const users = await prisma.user.findMany({
+        where: {
+            OR: [
+                {
+                    username: {
+                        startsWith: word,
+                        mode: 'insensitive'
+                    }
+                },
+                {
+                    first_name: {
+                        startsWith: word,
+                        mode: 'insensitive'
+                    }
+                },
+                {
+                    last_name: {
+                        startsWith: word,
+                        mode: 'insensitive'
+                    }
+                }
+            ]
+        },
+        take
+    })
     return users
-}
-
-async function getUserById (id: number) {
-    const userRole = await prisma.user.findUnique({
-        where: {
-            id
-        }
-    })
-    return userRole
-}
-
-async function getUserByEmail(email: string) {
-    const userRole = await prisma.user.findUnique({
-        where: {
-            email
-        }
-    })
-    return userRole
-}
-
-async function getUser (account: any) {
-    const userRole: any = await prisma.user.findUnique({
-        where: {
-            username: account.username,
-        }
-    })
-    if (!compareHash(account.password, userRole?.password)) {
-        throw new Error("Invalid credentials");
-    }
-    return userRole
 }
 
 async function createAttendance(id: number, studentId: number) {
@@ -151,13 +163,12 @@ async function updateUser (id: number, body: any) {
 export {
     createUser,
     getUsers,
-    getUser,
-    getUserById,
+    getUserBySearch,
+    getUserByField,
     createAttendance,
     createToken,
     deleteToken,
     getTokenById,
     updateUser,
-    getUserByEmail,
     updateToken
 }

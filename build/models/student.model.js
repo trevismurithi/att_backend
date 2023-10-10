@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateStudent = exports.updateStudentBooking = exports.getFilteredSearchStudents = exports.getFilterStudents = exports.setStudentBooking = exports.setStudentProfile = exports.getStudentById = exports.getAllStudents = exports.createStudent = void 0;
+exports.getFilterStudentsBooking = exports.updateStudent = exports.updateStudentBooking = exports.getFilteredSearchStudents = exports.getFilterStudents = exports.setStudentBooking = exports.setStudentProfile = exports.getStudentById = exports.getAllStudents = exports.createStudent = void 0;
 const prisma_1 = require("../services/prisma");
 async function createStudent(student) {
     const createStudent = await prisma_1.prisma.student.create({
@@ -41,7 +41,7 @@ async function createStudent(student) {
 }
 exports.createStudent = createStudent;
 async function getAllStudents(page = 1, take = 4) {
-    const skip = (page - 1) * take + 1;
+    const skip = (page - 1) * take;
     const allStudents = await prisma_1.prisma.student.findMany({
         include: {
             parent: true,
@@ -59,7 +59,7 @@ async function getAllStudents(page = 1, take = 4) {
 }
 exports.getAllStudents = getAllStudents;
 async function getFilterStudents(page = 1, take = 4) {
-    const skip = (page - 1) * take + 1;
+    const skip = (page - 1) * take;
     const allStudents = await prisma_1.prisma.student.findMany({
         where: {
             booking: {
@@ -85,6 +85,39 @@ async function getFilterStudents(page = 1, take = 4) {
     return { allStudents, count, page, take };
 }
 exports.getFilterStudents = getFilterStudents;
+async function getFilterStudentsBooking(word, take = 4) {
+    const allStudents = await prisma_1.prisma.student.findMany({
+        where: {
+            OR: [
+                {
+                    first_name: {
+                        startsWith: word,
+                        mode: 'insensitive'
+                    },
+                    booking: {
+                        isNot: null
+                    }
+                },
+                {
+                    last_name: {
+                        startsWith: word,
+                        mode: 'insensitive'
+                    },
+                    booking: {
+                        isNot: null
+                    }
+                }
+            ]
+        },
+        include: {
+            booking: true,
+            profile: true,
+        },
+        take
+    });
+    return allStudents;
+}
+exports.getFilterStudentsBooking = getFilterStudentsBooking;
 async function getFilteredSearchStudents(word, take = 10) {
     const allStudents = await prisma_1.prisma.student.findMany({
         where: {

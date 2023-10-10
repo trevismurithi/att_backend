@@ -1,9 +1,10 @@
 export = /* GraphQL */ `
 type Query {
-    users: [User]
+    users(page:Int!, take: Int!): UserLimit
     authUser(account: UserAuth!): IsUser
     userById(id: Int!): User
     refreshToken:Token
+    findUser (name: String!): [User]
 }
 
 type Mutation {
@@ -12,7 +13,7 @@ type Mutation {
     activateUser(id: Int!, token: String!): User
     forgotPassword(email: String!): String
     resetPassword(id: Int!, token: String!, password: String!): String
-    updateCurrentUser(id:Int!, data: String): User
+    updateCurrentUser(id:Int!, data: UserInput): User
 }
 
 type Token {
@@ -23,6 +24,12 @@ type IsUser {
     user: User
     token: String,
 }
+ type UserLimit {
+    users: [User]
+    count: Int
+    page: Int
+    take: Int
+ }
 
 type User {
     id: Int
@@ -44,6 +51,7 @@ input UserInput {
     email: String
     birthday: String
     class: String
+    enabled: Boolean
     password: String
 }
 

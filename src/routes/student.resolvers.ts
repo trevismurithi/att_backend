@@ -7,7 +7,8 @@ import {
     getFilterStudents,
     getFilteredSearchStudents,
     updateStudentBooking,
-    updateStudent
+    updateStudent,
+    getFilterStudentsBooking
 } from "../models/student.model"
 
 import { sendSMS } from '../services/sms'
@@ -59,6 +60,21 @@ export default {
             }
             const student = await getStudentById(args.id)
             return student
+        },
+        studentByBooking: async (_: any, args: any, context: any) => {
+            if (!context.user) {
+                throw new GraphQLError(
+                    "You are not authorized to perform this action",
+                    {
+                        extensions: {
+                            code: 'FORBIDDEN',
+                            http: { status: 401 }
+                        }
+                    }
+                );   
+            }
+            const students = await getFilterStudentsBooking(args.name)
+            return students
         },
         studentByName: async (_: any, args: any, context: any) => {
             if (!context.user) {
