@@ -28,7 +28,7 @@ async function updateParentProfile() {
             data: {
                 profile: {
                     create: {
-                        birthday: faker_1.faker.date.birthdate(),
+                        idCard: faker_1.faker.company.name(),
                         phone: faker_1.faker.phone.number(),
                         location: faker_1.faker.address.city()
                     }

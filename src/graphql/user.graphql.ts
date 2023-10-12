@@ -38,7 +38,7 @@ type User {
     last_name: String
     email: String
     role: String
-    birthday: String
+    idCard: String
     enabled: Boolean
     class: String
     createdAt: String
@@ -49,7 +49,7 @@ input UserInput {
     first_name: String
     last_name: String
     email: String
-    birthday: String
+    idCard: String
     class: String
     enabled: Boolean
     password: String

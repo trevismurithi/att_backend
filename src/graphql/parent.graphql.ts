@@ -56,13 +56,13 @@ type Parent {
 }
 
 type ParentProfile {
-    birthday: String
+    idCard: String
     phone: String
     location: String
 }
 
 input ProfileParentInput {
-    birthday: String
+    idCard: String
     phone: String
     location: String
 }

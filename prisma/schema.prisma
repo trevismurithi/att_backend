@@ -17,7 +17,7 @@ model User {
   last_name  String      @db.VarChar(255)
   email      String      @unique
   role       Role        @default(TEACHER)
-  birthday   DateTime
+  idCard     String
   password   String
   class      String?
   enabled    Boolean
@@ -59,7 +59,7 @@ model Parent {
 
 model ParentProfile {
   id        Int      @id @default(autoincrement())
-  birthday  DateTime
+  idCard    String
   phone     String   @unique @db.VarChar(255)
   location  String   @db.VarChar(255)
   parent    Parent   @relation(fields: [parentId], references: [id])

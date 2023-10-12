@@ -149,12 +149,12 @@ async function updateParent (id: number, data: any) {
             profile: {
                 upsert: {
                     create: {
-                        birthday: data.profile.birthday,
+                        idCard: data.profile.idCard,
                         phone: data.profile.phone,
                         location: data.profile.location
                     },
                     update: {
-                        birthday: data.profile.birthday,
+                        idCard: data.profile.idCard,
                         phone: data.profile.phone,
                         location: data.profile.location
                     }

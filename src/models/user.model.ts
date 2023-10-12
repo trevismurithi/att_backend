@@ -11,7 +11,7 @@ async function createUser(account: any, crypted: string) {
             email: account.email,
             class: account.class,
             enabled: false,
-            birthday: account.birthday,
+            idCard: account.idCard,
             password: hashing(account.password),
             token: {
                 create: {
