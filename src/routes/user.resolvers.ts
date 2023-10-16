@@ -14,6 +14,7 @@ import { signUser, compareDate, verifyUser } from '../services/jwt'
 import crypto from 'crypto'
 import { hashing, compareHash } from '../services/hashing'
 import { sendMail } from '../services/mailer'
+import { sendSMS } from '../services/sms'
 
 export default{
     Query: {
@@ -328,6 +329,37 @@ export default{
             }
             const user = await updateUser(args.id, args.data)
             return user
+        },
+        sendBulkSMS: async (_:any, args: any, context: any) => {
+            if (!context.user) {
+                throw new GraphQLError(
+                    "You are not authorized to perform this action",
+                    {
+                        extensions: {
+                            code: 'FORBIDDEN',
+                            http: { status: 401 }
+                        }
+                    }
+                );   
+            }
+            const numbers = String(args.contacts).split(',')
+            console.log(numbers, numbers[0])
+            if (numbers.length === 0) {
+                throw new GraphQLError(
+                    "contact values are invalid",
+                    {
+                        extensions: {
+                            code: 'FORBIDDEN',
+                            http: { status: 400 }
+                        }
+                    }
+                );
+            }
+            sendSMS(
+                numbers,
+                args.message
+            )
+            return 'message sent'
         },
     }
 }

@@ -20,7 +20,7 @@ async function createStudents(id, students) {
     });
 }
 async function updateParentProfile() {
-    for (let index = 0; index < 50; index++) {
+    for (let index = 0; index < 100; index++) {
         await prisma_1.prisma.parent.update({
             where: {
                 id: index + 1
@@ -33,35 +33,35 @@ async function updateParentProfile() {
                         location: faker_1.faker.address.city()
                     }
                 },
-                relations: {
-                    create: {
-                        status: 'PARENT',
-                        student: {
-                            connect: {
-                                id: index + 1
-                            },
-                        }
-                    }
-                }
+                // relations: {
+                //     create: {
+                //         status: 'PARENT',
+                //         student: {
+                //             connect: {
+                //                 id: index+1
+                //             },
+                //         }
+                //     }
+                // }
             }
         });
-        await prisma_1.prisma.parent.update({
-            where: {
-                id: index + 1
-            },
-            data: {
-                relations: {
-                    create: {
-                        status: 'PARENT',
-                        student: {
-                            connect: {
-                                id: index + 2
-                            },
-                        }
-                    }
-                }
-            }
-        });
+        // await prisma.parent.update({
+        //     where: {
+        //         id: index +1 
+        //     },
+        //     data: {
+        //         relations: {
+        //             create: {
+        //                 status: 'PARENT',
+        //                 student: {
+        //                     connect: {
+        //                         id: index+2
+        //                     },
+        //                 }
+        //             }
+        //         }
+        //     }
+        // })
     }
     for (let index = 0; index < 100; index++) {
         await prisma_1.prisma.student.update({
@@ -75,6 +75,16 @@ async function updateParentProfile() {
                         school_class: faker_1.faker.animal.bird(),
                         sunday_class: faker_1.faker.animal.bear()
                     }
+                },
+                relations: {
+                    create: {
+                        status: 'PARENT',
+                        parent: {
+                            connect: {
+                                id: index + 1
+                            }
+                        }
+                    }
                 }
             }
         });
@@ -82,7 +92,7 @@ async function updateParentProfile() {
 }
 function createManyParents() {
     const parents = [];
-    for (let index = 0; index < 50; index++) {
+    for (let index = 0; index < 100; index++) {
         parents.push({
             first_name: faker_1.faker.name.firstName(),
             last_name: faker_1.faker.name.lastName(),
@@ -101,7 +111,7 @@ function createManyParents() {
 }
 async function createManyStudents() {
     const students = [];
-    for (let index = 0; index < 50; index++) {
+    for (let index = 0; index < 100; index++) {
         students.push(createStudents(index + 1, [
             {
                 first_name: faker_1.faker.name.firstName(),
@@ -128,31 +138,31 @@ async function createManyStudents() {
                 //     }
                 // ]
             },
-            {
-                first_name: faker_1.faker.name.firstName(),
-                last_name: faker_1.faker.name.lastName(),
-                birthday: faker_1.faker.date.birthdate(),
-                sex: faker_1.faker.name.sex(),
-                // profile: {
-                //     create: {
-                //         school_name: faker.word.noun() + 'School',
-                //         school_class: faker.animal.bird(),
-                //         sunday_class: faker.animal.bear()
-                //     }
-                // },
-                // relations: [
-                //     {
-                //         create: {
-                //             status: 'PARENT',
-                //             parent: {
-                //                 connect: {
-                //                     id: index + 1
-                //                 }
-                //             }
-                //         }
-                //     }
-                // ]
-            }
+            // {
+            //     first_name: faker.name.firstName(),
+            //     last_name: faker.name.lastName(),
+            //     birthday: faker.date.birthdate(),
+            //     sex: faker.name.sex(),
+            //     profile: {
+            //         create: {
+            //             school_name: faker.word.noun() + 'School',
+            //             school_class: faker.animal.bird(),
+            //             sunday_class: faker.animal.bear()
+            //         }
+            //     },
+            //     relations: [
+            //         {
+            //             create: {
+            //                 status: 'PARENT',
+            //                 parent: {
+            //                     connect: {
+            //                         id: index + 1
+            //                     }
+            //                 }
+            //             }
+            //         }
+            //     ]
+            // }
         ]));
     }
     await prisma_1.prisma.$transaction(students)

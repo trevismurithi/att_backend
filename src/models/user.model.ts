@@ -1,5 +1,5 @@
 import { prisma } from "../services/prisma";
-import { hashing, compareHash } from '../services/hashing'
+import { hashing } from '../services/hashing'
 
 async function createUser(account: any, crypted: string) {
 

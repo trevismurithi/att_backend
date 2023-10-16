@@ -15,6 +15,7 @@ type Mutation {
     forgotPassword(email: String!): String
     resetPassword(id: Int!, token: String!, password: String!): String
     updateCurrentUser(id:Int!, data: UserInput): User
+    sendBulkSMS(contacts: [String], message: String): String
 }
 
 type Token {

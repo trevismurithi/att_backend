@@ -23,9 +23,7 @@ input StudentInput {
     school_name: String!
     school_class: String!
     sunday_class: String!
-    status: String!
     parentId: Int
-    relationsId: Int
 }
 
 type StudentLimit {
@@ -43,7 +41,6 @@ type Student {
     sex: String
     profile: Profile
     parent: Parent
-    relations: [Relationship]
     booking: Booking
 }
 

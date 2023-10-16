@@ -28,19 +28,19 @@ model User {
 }
 
 model Student {
-  id         Int            @id @default(autoincrement())
-  first_name String         @db.VarChar(255)
-  last_name  String         @db.VarChar(255)
+  id         Int           @id @default(autoincrement())
+  first_name String        @db.VarChar(255)
+  last_name  String        @db.VarChar(255)
   birthday   DateTime
   sex        String
   profile    Profile?
-  parent     Parent?        @relation(fields: [parentId], references: [id])
+  parent     Parent?       @relation(fields: [parentId], references: [id])
   parentId   Int
   booking    Booking?
-  relations  Relationship[]
+  relations  Relationship?
   attendance Attendace[]
-  createdAt  DateTime       @default(now())
-  updatedAt  DateTime       @updatedAt
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
 }
 
 model Parent {
@@ -86,10 +86,9 @@ model Relationship {
   parent    Parent   @relation(fields: [parentId], references: [id])
   parentId  Int
   student   Student  @relation(fields: [studentId], references: [id])
-  studentId Int
+  studentId Int      @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
   @@unique([parentId, studentId])
 }
 
@@ -127,6 +126,7 @@ enum Role {
   ADMIN
   PARENT
   TEACHER
+  CHILD
 }
 
 enum Status {

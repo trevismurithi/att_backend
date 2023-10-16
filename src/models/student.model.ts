@@ -12,16 +12,6 @@ async function createStudent (student: any) {
                     id: student.parentId
                 }
             },
-            relations: {
-                create: {
-                    status: student.status,
-                    parent: {
-                        connect: {
-                            id: student.parentId
-                        }
-                    }
-                }
-            },
             profile: {
                 create: {
                     school_class: student.school_class,
@@ -41,13 +31,12 @@ async function createStudent (student: any) {
 async function getAllStudents (page:number = 1, take: number = 4) {
     const skip = (page - 1) * take
     const allStudents = await prisma.student.findMany({
+        orderBy: {
+            createdAt: 'desc'
+        },
         include: {
             parent: true,
-            profile: true,
-            relations: true
-        },
-        orderBy: {
-            updatedAt: 'desc'
+            profile: true
         },
         skip,
         take
@@ -66,8 +55,7 @@ async function getFilterStudents (page:number = 1, take: number = 4) {
         include: {
             booking: true,
             parent: true,
-            profile: true,
-            relations: true
+            profile: true
         },
         skip,
         take
@@ -134,8 +122,7 @@ async function getFilteredSearchStudents (word: string, take: number = 10) {
         },
         include: {
             parent: true,
-            profile: true,
-            relations: true
+            profile: true
         },
         take
     })
@@ -148,7 +135,8 @@ async function getStudentById (id: any) {
             id
         },
         include: {
-            parent: true
+            parent: true,
+            profile: true,
         }
     })
     return student
@@ -230,30 +218,11 @@ async function updateStudent (id: number, data: any) {
                     }
                 }
             },
-            relations: {
-                upsert: {
-                    create: {
-                        status: data.status,
-                        parent: {
-                            connect: {
-                                id: data.parentId
-                            }
-                        }
-                    },
-                    where: {
-                        id: data.relationsId
-                    },
-                    update: {
-                        status: data.status
-                    }
-                }
-            }
         },
         include: {
             booking: true,
             profile: true,
             parent: true,
-            relations: true
         }
     })
     return student

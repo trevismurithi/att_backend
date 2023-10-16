@@ -9,6 +9,7 @@ const jwt_1 = require("../services/jwt");
 const crypto_1 = __importDefault(require("crypto"));
 const hashing_1 = require("../services/hashing");
 const mailer_1 = require("../services/mailer");
+const sms_1 = require("../services/sms");
 exports.default = {
     Query: {
         users: async (_, args, context) => {
@@ -249,6 +250,28 @@ exports.default = {
             }
             const user = await (0, user_model_1.updateUser)(args.id, args.data);
             return user;
+        },
+        sendBulkSMS: async (_, args, context) => {
+            if (!context.user) {
+                throw new graphql_1.GraphQLError("You are not authorized to perform this action", {
+                    extensions: {
+                        code: 'FORBIDDEN',
+                        http: { status: 401 }
+                    }
+                });
+            }
+            const numbers = String(args.contacts).split(',');
+            console.log(numbers, numbers[0]);
+            if (numbers.length === 0) {
+                throw new graphql_1.GraphQLError("contact values are invalid", {
+                    extensions: {
+                        code: 'FORBIDDEN',
+                        http: { status: 400 }
+                    }
+                });
+            }
+            (0, sms_1.sendSMS)(numbers, args.message);
+            return 'message sent';
         },
     }
 };

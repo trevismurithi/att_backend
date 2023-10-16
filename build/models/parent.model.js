@@ -23,16 +23,6 @@ async function createParent(parent) {
                             sunday_class: parent.student.sunday_class
                         }
                     },
-                    relations: {
-                        create: {
-                            status: parent.student.status,
-                            parent: {
-                                connect: {
-                                    email: parent.email
-                                }
-                            }
-                        }
-                    }
                 }
             }
         },
