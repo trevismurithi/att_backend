@@ -8,11 +8,11 @@ const africastalking = AfricasTalking({
     apiKey: process.env.AFRICA_API_KEY,
     username: process.env.AFRICA_USERNAME
 });
-async function sendSMS(phone, message) {
+async function sendSMS(numbers, message) {
     // TODO: Send message
     try {
         const result = await africastalking.SMS.send({
-            to: phone,
+            to: numbers,
             message: message,
             // from: '[Your_sender_ID_goes_here]'
         });

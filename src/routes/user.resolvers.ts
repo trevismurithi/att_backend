@@ -7,7 +7,8 @@ import {
     getTokenById,
     updateUser,
     deleteToken,
-    updateToken
+    updateToken,
+    getContactsByUser
 } from "../models/user.model"
 import { GraphQLError } from 'graphql'
 import { signUser, compareDate, verifyUser } from '../services/jwt'
@@ -50,7 +51,7 @@ export default{
             // generate token and refresh token
             const token = signUser(
                 {id: user.id, username: user.username},
-                '10m'
+                '1h'
                 )
             const refreshToken = signUser(
                 { id: user.id, username: user.username },
@@ -155,7 +156,7 @@ export default{
             // generate token and refresh token
             const token = signUser(
                 { id: user.id, username: user.username },
-                '10m'
+                '1h'
             )
 
             return {
@@ -342,21 +343,32 @@ export default{
                     }
                 );   
             }
-            const numbers = String(args.contacts).split(',')
-            console.log(numbers, numbers[0])
-            if (numbers.length === 0) {
+            const user = await getUserByField({id: context.user.id})
+            if (!user) {
                 throw new GraphQLError(
-                    "contact values are invalid",
+                    "You are not authorized to perform this action",
                     {
                         extensions: {
                             code: 'FORBIDDEN',
-                            http: { status: 400 }
+                            http: { status: 401 }
                         }
                     }
-                );
+                );   
+            }
+            const numbers = await getContactsByUser(user.id, args.groupName)
+            if (!numbers) {
+                throw new GraphQLError(
+                    "You are not authorized to perform this action",
+                    {
+                        extensions: {
+                            code: 'FORBIDDEN',
+                            http: { status: 401 }
+                        }
+                    }
+                );   
             }
             sendSMS(
-                numbers,
+                numbers.map((num:any)=> num.phone),
                 args.message
             )
             return 'message sent'

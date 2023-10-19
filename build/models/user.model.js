@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateToken = exports.updateUser = exports.getTokenById = exports.deleteToken = exports.createToken = exports.createAttendance = exports.getUserByField = exports.getUserBySearch = exports.getUsers = exports.createUser = void 0;
+exports.getContactsByUser = exports.updateToken = exports.updateUser = exports.getTokenById = exports.deleteToken = exports.createToken = exports.createAttendance = exports.getUserByField = exports.getUserBySearch = exports.getUsers = exports.createUser = void 0;
 const prisma_1 = require("../services/prisma");
 const hashing_1 = require("../services/hashing");
 async function createUser(account, crypted) {
@@ -36,7 +36,10 @@ async function getUsers(page = 1, take = 4) {
 exports.getUsers = getUsers;
 async function getUserByField(field) {
     const userRole = await prisma_1.prisma.user.findUnique({
-        where: field
+        where: field,
+        include: {
+            groups: true,
+        }
     });
     return userRole;
 }
@@ -155,8 +158,28 @@ async function updateUser(id, body) {
         where: {
             id
         },
-        data: body
+        data: body,
+        include: {
+            groups: true
+        }
     });
     return user;
 }
 exports.updateUser = updateUser;
+async function getContactsByUser(id, group) {
+    const contacts = await prisma_1.prisma.contacts.findMany({
+        where: {
+            group: {
+                name: group,
+                user: {
+                    id
+                }
+            }
+        },
+        select: {
+            phone: true
+        }
+    });
+    return contacts;
+}
+exports.getContactsByUser = getContactsByUser;

@@ -23,6 +23,7 @@ model User {
   enabled    Boolean
   token      Token?
   attendance Attendace[]
+  groups     Group[]
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
 }
@@ -89,6 +90,7 @@ model Relationship {
   studentId Int      @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
   @@unique([parentId, studentId])
 }
 
@@ -118,6 +120,25 @@ model Booking {
   status    Status
   student   Student  @relation(fields: [studentId], references: [id])
   studentId Int      @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Group {
+  id        Int        @id @default(autoincrement())
+  name      String     @db.VarChar(255)
+  contacts  Contacts[]
+  user      User       @relation(fields: [userId], references: [id])
+  userId    Int
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Contacts {
+  id        Int      @id @default(autoincrement())
+  phone     String   @db.VarChar(255)
+  group     Group    @relation(fields: [groupId], references: [id])
+  groupId   Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

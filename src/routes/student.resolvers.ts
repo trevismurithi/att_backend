@@ -153,7 +153,7 @@ export default {
             const booking = await updateStudentBooking(args.id, {status: args.status})
             // send sms to user
             const message = booking.status === 'PICK'? `${booking.student.first_name} has been picked`:`${booking.student.first_name} has been dropped`
-            sendSMS(["+254725844498", "+254724462514"], message,)
+            sendSMS(["+254725844498", "+254724462514", "+254716089299"], message,)
             return booking
         },
         updateStudent: async (_: any, args: any, context: any) => {

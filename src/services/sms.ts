@@ -8,12 +8,12 @@ const africastalking = AfricasTalking({
 });
 
 
-export async function sendSMS(phone: any, message: string) {
+export async function sendSMS(numbers: any, message: string) {
 
     // TODO: Send message
     try {
         const result = await africastalking.SMS.send({
-            to: phone,
+            to: numbers,
             message: message,
             // from: '[Your_sender_ID_goes_here]'
         });

@@ -15,7 +15,7 @@ type Mutation {
     forgotPassword(email: String!): String
     resetPassword(id: Int!, token: String!, password: String!): String
     updateCurrentUser(id:Int!, data: UserInput): User
-    sendBulkSMS(contacts: [String], message: String): String
+    sendBulkSMS(groupName: String, message: String): String
 }
 
 type Token {
@@ -44,6 +44,18 @@ type User {
     enabled: Boolean
     class: String
     createdAt: String
+    groups: [Group]
+}
+
+type Group {
+    id: Int
+    name: String
+    contacts: [Contacts]
+}
+
+type Contacts {
+    id: Int
+    phone: String
 }
 
 input UserInput {

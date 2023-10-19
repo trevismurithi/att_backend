@@ -15,8 +15,10 @@ const http_1 = __importDefault(require("http"));
 const load_files_1 = require("@graphql-tools/load-files");
 const path_1 = __importDefault(require("path"));
 const jwt_1 = require("./services/jwt");
+const file_routes_1 = require("./routes/file.routes");
 // Required logic for intergrating with express
 var app = (0, express_1.default)();
+app.use('/file', (0, cors_1.default)({ origin: 'http://localhost:3000' }), body_parser_1.default.json({ limit: '50mb' }), file_routes_1.fileRouter);
 // Our httpServer handles incoming requests to our Express app.
 // Below, we tell Apollo Server to drain this httpServer
 // enabling our servers to shut down gracefully

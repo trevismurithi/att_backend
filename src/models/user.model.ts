@@ -35,7 +35,10 @@ async function getUsers (page:number = 1, take: number = 4) {
 
 async function getUserByField (field: any) {
     const userRole = await prisma.user.findUnique({
-        where: field
+        where: field, 
+        include: {
+            groups: true,
+        }
     })
     return userRole
 }
@@ -155,11 +158,30 @@ async function updateUser (id: number, body: any) {
         where: {
             id
         },
-        data: body
+        data: body,
+        include: {
+            groups: true
+        }
     })
     return user
 }
 
+async function getContactsByUser (id: number, group: string) {
+    const contacts = await prisma.contacts.findMany({
+        where: {
+            group: {
+                name: group,
+                user: {
+                    id
+                }
+            }
+        },
+        select: {
+            phone: true
+        }
+    })
+    return contacts
+}
 export {
     createUser,
     getUsers,
@@ -170,5 +192,6 @@ export {
     deleteToken,
     getTokenById,
     updateUser,
-    updateToken
+    updateToken,
+    getContactsByUser
 }

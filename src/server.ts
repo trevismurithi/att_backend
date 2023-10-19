@@ -10,9 +10,17 @@ import http from 'http'
 import { loadFilesSync } from '@graphql-tools/load-files'
 import path from 'path'
 import { verifyUser } from './services/jwt'
+import { fileRouter } from './routes/file.routes'
 
 // Required logic for intergrating with express
 var app = express()
+
+app.use(
+    '/file',
+    cors<cors.CorsRequest>({ origin: 'http://localhost:3000' }),
+    bodyParser.json({ limit: '50mb' }),
+    fileRouter
+    )
 
 // Our httpServer handles incoming requests to our Express app.
 // Below, we tell Apollo Server to drain this httpServer

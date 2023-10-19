@@ -36,7 +36,7 @@ exports.default = {
             }
             // TDOD: check if user is enabled
             // generate token and refresh token
-            const token = (0, jwt_1.signUser)({ id: user.id, username: user.username }, '10m');
+            const token = (0, jwt_1.signUser)({ id: user.id, username: user.username }, '1h');
             const refreshToken = (0, jwt_1.signUser)({ id: user.id, username: user.username }, '1d');
             // set cookie in browser
             await context.res.cookie('jsonwebtoken', refreshToken, {
@@ -115,7 +115,7 @@ exports.default = {
                 });
             }
             // generate token and refresh token
-            const token = (0, jwt_1.signUser)({ id: user.id, username: user.username }, '10m');
+            const token = (0, jwt_1.signUser)({ id: user.id, username: user.username }, '1h');
             return {
                 token
             };
@@ -260,17 +260,25 @@ exports.default = {
                     }
                 });
             }
-            const numbers = String(args.contacts).split(',');
-            console.log(numbers, numbers[0]);
-            if (numbers.length === 0) {
-                throw new graphql_1.GraphQLError("contact values are invalid", {
+            const user = await (0, user_model_1.getUserByField)({ id: context.user.id });
+            if (!user) {
+                throw new graphql_1.GraphQLError("You are not authorized to perform this action", {
                     extensions: {
                         code: 'FORBIDDEN',
-                        http: { status: 400 }
+                        http: { status: 401 }
                     }
                 });
             }
-            (0, sms_1.sendSMS)(numbers, args.message);
+            const numbers = await (0, user_model_1.getContactsByUser)(user.id, args.groupName);
+            if (!numbers) {
+                throw new graphql_1.GraphQLError("You are not authorized to perform this action", {
+                    extensions: {
+                        code: 'FORBIDDEN',
+                        http: { status: 401 }
+                    }
+                });
+            }
+            (0, sms_1.sendSMS)(numbers.map((num) => num.phone), args.message);
             return 'message sent';
         },
     }
