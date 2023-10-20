@@ -182,6 +182,7 @@ async function getContactsByUser (id: number, group: string) {
     })
     return contacts
 }
+
 export {
     createUser,
     getUsers,

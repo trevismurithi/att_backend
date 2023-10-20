@@ -147,7 +147,8 @@ enum Role {
   ADMIN
   PARENT
   TEACHER
-  CHILD
+  TRANSIT
+  MANAGER
 }
 
 enum Status {

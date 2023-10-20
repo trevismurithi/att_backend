@@ -26,7 +26,7 @@ async function sendMail(html, email) {
     });
     // send mail with defined transport object
     let info = await transporter.sendMail({
-        from: '"Support Team 👻" trevis@360onlineafrica.co.ke',
+        from: '"Support Team 👻" <no-reply@360onlineafrica.co.ke>',
         to: email,
         subject: "Hello ✔",
         text: "Hello world?",

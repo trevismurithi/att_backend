@@ -4,15 +4,19 @@ import {
     setRelationship,
     getParentById,
     getFilteredParents,
-    updateParent
+    updateParent,
+    getParentsByClass
 } from "../models/parent.model"
+
+import { getUserByField } from "../models/user.model";
+
 
 import { GraphQLError } from 'graphql'
 
 export default {
     Query: {
         parents: async (_: any, args: any, context: any) => {
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new GraphQLError(
                     "You are not authorized to perform this action",
                     {
@@ -23,11 +27,25 @@ export default {
                     }
                 );   
             }
-            const parentLimit = await getAllParents(args.page, args.take)
-            return parentLimit
+            const user:any = await getUserByField({ id: context.user.id})
+            if (!user) {
+                throw new GraphQLError(
+                    "You are not authorized to perform this action",
+                    {
+                        extensions: {
+                            code: 'FORBIDDEN',
+                            http: { status: 401 }
+                        }
+                    }
+                );  
+            }
+            if(user.role === 'ADMIN') {
+                return getAllParents(args.page, args.take)
+            }
+            return getParentsByClass(user.class, args.page, args.take)
         },
         parentById: async (_: any, args: any, context: any) => {
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new GraphQLError(
                     "You are not authorized to perform this action",
                     {
@@ -42,7 +60,7 @@ export default {
             return parent
         },
         findParent: async (_: any, args: any, context: any) => {
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new GraphQLError(
                     "You are not authorized to perform this action",
                     {
@@ -53,13 +71,27 @@ export default {
                     }
                 );   
             }
-            const parent = await getFilteredParents(args.name)
-            return parent
+            const user:any = await getUserByField({ id: context.user.id})
+            if (!user) {
+                throw new GraphQLError(
+                    "You are not authorized to perform this action",
+                    {
+                        extensions: {
+                            code: 'FORBIDDEN',
+                            http: { status: 401 }
+                        }
+                    }
+                );  
+            }
+            if (user.role === 'ADMIN') {
+                return getFilteredParents('', args.name)
+            }
+            return getFilteredParents(user.class, args.name)
         },
     },
     Mutation: {
         createParent: async (_:any, args: any, context: any) => {
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new GraphQLError(
                     "You are not authorized to perform this action",
                     {
@@ -74,7 +106,7 @@ export default {
             return parent
         },
         createRelationship: async (_:any, args: any, context: any) => {
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new GraphQLError(
                     "You are not authorized to perform this action",
                     {
@@ -89,7 +121,7 @@ export default {
             return parent
         },
         updateParent: async (_:any, args: any, context: any) => {
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new GraphQLError(
                     "You are not authorized to perform this action",
                     {

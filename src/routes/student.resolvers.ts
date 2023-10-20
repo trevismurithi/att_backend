@@ -11,13 +11,13 @@ import {
     getFilterStudentsBooking
 } from "../models/student.model"
 
-import { sendSMS } from '../services/sms'
+import { sendMTSMS } from '../services/sms'
 
 import { GraphQLError } from 'graphql'
 export default {
     Query: {
         students: async (_: any, args: any, context: any) => {
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new GraphQLError(
                     "You are not authorized to perform this action",
                     {
@@ -32,7 +32,7 @@ export default {
             return studentLimit
         },
         studentBooking: async (_: any, args: any, context: any) => {
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new GraphQLError(
                     "You are not authorized to perform this action",
                     {
@@ -47,7 +47,7 @@ export default {
             return students
         },
         studentById: async (_: any, args: any, context: any) => {
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new GraphQLError(
                     "You are not authorized to perform this action",
                     {
@@ -62,7 +62,7 @@ export default {
             return student
         },
         studentByBooking: async (_: any, args: any, context: any) => {
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new GraphQLError(
                     "You are not authorized to perform this action",
                     {
@@ -77,7 +77,7 @@ export default {
             return students
         },
         studentByName: async (_: any, args: any, context: any) => {
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new GraphQLError(
                     "You are not authorized to perform this action",
                     {
@@ -94,7 +94,7 @@ export default {
     },
     Mutation: {
         createStudent: async (_: any, args: any, context: any) => {
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new GraphQLError(
                     "You are not authorized to perform this action",
                     {
@@ -109,7 +109,7 @@ export default {
             return student
         },
         createProfile: async (_: any, args: any, context: any) => {
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new GraphQLError(
                     "You are not authorized to perform this action",
                     {
@@ -124,7 +124,7 @@ export default {
             return student
         },
         createStudentBooking: async (_: any, args: any, context: any) => {
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new GraphQLError(
                     "You are not authorized to perform this action",
                     {
@@ -139,7 +139,7 @@ export default {
             return student
         },
         updateStudentBooking: async (_: any, args: any, context: any) => {
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new GraphQLError(
                     "You are not authorized to perform this action",
                     {
@@ -153,11 +153,11 @@ export default {
             const booking = await updateStudentBooking(args.id, {status: args.status})
             // send sms to user
             const message = booking.status === 'PICK'? `${booking.student.first_name} has been picked`:`${booking.student.first_name} has been dropped`
-            sendSMS(["+254725844498", "+254724462514", "+254716089299"], message,)
+            sendMTSMS(["+254724462514", "+254716089299"].join(','), message,)
             return booking
         },
         updateStudent: async (_: any, args: any, context: any) => {
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new GraphQLError(
                     "You are not authorized to perform this action",
                     {

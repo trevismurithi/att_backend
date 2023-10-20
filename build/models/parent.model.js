@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateParent = exports.getFilteredParents = exports.getParentById = exports.setRelationship = exports.getAllParents = exports.createParent = void 0;
+exports.getParentsByClass = exports.updateParent = exports.getFilteredParents = exports.getParentById = exports.setRelationship = exports.getAllParents = exports.createParent = void 0;
 const prisma_1 = require("../services/prisma");
 async function createParent(parent) {
     const userParent = await prisma_1.prisma.parent.create({
@@ -98,7 +98,44 @@ async function getAllParents(page = 1, take = 4) {
     return { allParents, count, page, take };
 }
 exports.getAllParents = getAllParents;
-async function getFilteredParents(word, take = 10) {
+async function getParentsByClass(room, page = 1, take = 4) {
+    const skip = (page - 1) * take;
+    const allParents = await prisma_1.prisma.parent.findMany({
+        where: {
+            students: {
+                every: {
+                    profile: {
+                        school_class: room
+                    }
+                }
+            }
+        },
+        include: {
+            profile: true,
+            students: true,
+            relations: true
+        },
+        orderBy: {
+            updatedAt: 'desc'
+        },
+        skip,
+        take
+    });
+    const count = await prisma_1.prisma.parent.count({
+        where: {
+            students: {
+                every: {
+                    profile: {
+                        school_class: room
+                    }
+                }
+            }
+        },
+    });
+    return { allParents, count, page, take };
+}
+exports.getParentsByClass = getParentsByClass;
+async function getFilteredParents(room, word, take = 10) {
     const allParents = await prisma_1.prisma.parent.findMany({
         where: {
             OR: [
@@ -106,12 +143,26 @@ async function getFilteredParents(word, take = 10) {
                     first_name: {
                         startsWith: word,
                         mode: 'insensitive'
+                    },
+                    students: {
+                        every: {
+                            profile: {
+                                school_class: room
+                            }
+                        }
                     }
                 },
                 {
                     last_name: {
                         startsWith: word,
                         mode: 'insensitive'
+                    },
+                    students: {
+                        every: {
+                            profile: {
+                                school_class: room
+                            }
+                        }
                     }
                 }
             ]

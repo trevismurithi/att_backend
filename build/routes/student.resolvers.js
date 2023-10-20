@@ -6,7 +6,7 @@ const graphql_1 = require("graphql");
 exports.default = {
     Query: {
         students: async (_, args, context) => {
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new graphql_1.GraphQLError("You are not authorized to perform this action", {
                     extensions: {
                         code: 'FORBIDDEN',
@@ -18,7 +18,7 @@ exports.default = {
             return studentLimit;
         },
         studentBooking: async (_, args, context) => {
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new graphql_1.GraphQLError("You are not authorized to perform this action", {
                     extensions: {
                         code: 'FORBIDDEN',
@@ -30,7 +30,7 @@ exports.default = {
             return students;
         },
         studentById: async (_, args, context) => {
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new graphql_1.GraphQLError("You are not authorized to perform this action", {
                     extensions: {
                         code: 'FORBIDDEN',
@@ -42,7 +42,7 @@ exports.default = {
             return student;
         },
         studentByBooking: async (_, args, context) => {
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new graphql_1.GraphQLError("You are not authorized to perform this action", {
                     extensions: {
                         code: 'FORBIDDEN',
@@ -54,7 +54,7 @@ exports.default = {
             return students;
         },
         studentByName: async (_, args, context) => {
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new graphql_1.GraphQLError("You are not authorized to perform this action", {
                     extensions: {
                         code: 'FORBIDDEN',
@@ -68,7 +68,7 @@ exports.default = {
     },
     Mutation: {
         createStudent: async (_, args, context) => {
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new graphql_1.GraphQLError("You are not authorized to perform this action", {
                     extensions: {
                         code: 'FORBIDDEN',
@@ -80,7 +80,7 @@ exports.default = {
             return student;
         },
         createProfile: async (_, args, context) => {
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new graphql_1.GraphQLError("You are not authorized to perform this action", {
                     extensions: {
                         code: 'FORBIDDEN',
@@ -92,7 +92,7 @@ exports.default = {
             return student;
         },
         createStudentBooking: async (_, args, context) => {
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new graphql_1.GraphQLError("You are not authorized to perform this action", {
                     extensions: {
                         code: 'FORBIDDEN',
@@ -104,7 +104,7 @@ exports.default = {
             return student;
         },
         updateStudentBooking: async (_, args, context) => {
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new graphql_1.GraphQLError("You are not authorized to perform this action", {
                     extensions: {
                         code: 'FORBIDDEN',
@@ -115,11 +115,11 @@ exports.default = {
             const booking = await (0, student_model_1.updateStudentBooking)(args.id, { status: args.status });
             // send sms to user
             const message = booking.status === 'PICK' ? `${booking.student.first_name} has been picked` : `${booking.student.first_name} has been dropped`;
-            (0, sms_1.sendSMS)(["+254725844498", "+254724462514", "+254716089299"], message);
+            (0, sms_1.sendMTSMS)(["+254724462514", "+254716089299"].join(','), message);
             return booking;
         },
         updateStudent: async (_, args, context) => {
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new graphql_1.GraphQLError("You are not authorized to perform this action", {
                     extensions: {
                         code: 'FORBIDDEN',

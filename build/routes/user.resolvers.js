@@ -13,7 +13,7 @@ const sms_1 = require("../services/sms");
 exports.default = {
     Query: {
         users: async (_, args, context) => {
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new graphql_1.GraphQLError("You are not authorized to perform this action", {
                     extensions: {
                         code: 'FORBIDDEN',
@@ -52,7 +52,7 @@ exports.default = {
             };
         },
         userById: async (_, args, context) => {
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new graphql_1.GraphQLError("You are not authorized to perform this action", {
                     extensions: {
                         code: 'FORBIDDEN',
@@ -72,7 +72,7 @@ exports.default = {
             return user;
         },
         findUser: async (_, args, context) => {
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new graphql_1.GraphQLError("You are not authorized to perform this action", {
                     extensions: {
                         code: 'FORBIDDEN',
@@ -84,7 +84,7 @@ exports.default = {
             return users;
         },
         refreshToken: async (_, __, context) => {
-            console.dir(context.req.cookies, { depth: null });
+            // console.dir(context.req.cookies, {depth: null})
             // get tokens if available
             if (!context.req.cookies || !context.req.cookies.jsonwebtoken) {
                 throw new graphql_1.GraphQLError('Authentication expired', {
@@ -130,8 +130,16 @@ exports.default = {
             // save the token
             const user = await (0, user_model_1.createUser)(args.account, encrypt);
             // generate a url
+            if (!user) {
+                throw new graphql_1.GraphQLError("Bad user request body", {
+                    extensions: {
+                        code: 'FORBIDDEN',
+                        http: { status: 400 }
+                    }
+                });
+            }
             const url = `http://localhost:3000/activate?id=${user.id}&token=${token}`;
-            await (0, mailer_1.sendMail)(`
+            (0, mailer_1.sendMail)(`
                 <p>You can now activate your account</p>
                 <p>${url}</p>
                 `, user.email);
@@ -228,8 +236,7 @@ exports.default = {
             return "success password reset";
         },
         createAttendace: async (_, args, context) => {
-            const attend = await (0, user_model_1.createAttendance)(args.id, args.studentId);
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new graphql_1.GraphQLError("You are not authorized to perform this action", {
                     extensions: {
                         code: 'FORBIDDEN',
@@ -237,10 +244,11 @@ exports.default = {
                     }
                 });
             }
+            const attend = await (0, user_model_1.createAttendance)(args.id, args.studentId);
             return attend;
         },
         updateCurrentUser: async (_, args, context) => {
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new graphql_1.GraphQLError("You are not authorized to perform this action", {
                     extensions: {
                         code: 'FORBIDDEN',
@@ -252,7 +260,7 @@ exports.default = {
             return user;
         },
         sendBulkSMS: async (_, args, context) => {
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new graphql_1.GraphQLError("You are not authorized to perform this action", {
                     extensions: {
                         code: 'FORBIDDEN',
@@ -278,7 +286,8 @@ exports.default = {
                     }
                 });
             }
-            (0, sms_1.sendSMS)(numbers.map((num) => num.phone), args.message);
+            console.log('numbers: ', numbers.map((num) => num.phone).join(','));
+            (0, sms_1.sendMTSMS)(numbers.map((num) => num.phone).join(','), args.message);
             return 'message sent';
         },
     }

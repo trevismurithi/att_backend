@@ -1,4 +1,7 @@
 const AfricasTalking = require('africastalking');
+import axios from 'axios'
+import 'dotenv/config'
+
 require('dotenv').config()
 
 // TODO: Initialize Africa's Talking
@@ -8,7 +11,7 @@ const africastalking = AfricasTalking({
 });
 
 
-export async function sendSMS(numbers: any, message: string) {
+export async function sendATSMS(numbers: any, message: string) {
 
     // TODO: Send message
     try {
@@ -22,3 +25,25 @@ export async function sendSMS(numbers: any, message: string) {
         console.error(ex);
     }
 };
+
+export async function sendMTSMS(numbers: any, message: string) {
+    try {
+        const result = await axios.post('https://api.mobitechtechnologies.com/sms/sendbulksms',
+            {
+                "mobile": numbers,
+                "response_type": "json",
+                "sender_name": "23107",
+                "service_id": 0,
+                "message": message
+            },
+            {
+                headers: {
+                    h_api_key: process.env.MOBI_API_KEY,
+                    "Content-Type": "application/json"
+                }
+            })
+            console.log(result)
+    } catch (error) {
+        console.error(error)
+    }
+}

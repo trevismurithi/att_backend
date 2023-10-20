@@ -95,8 +95,44 @@ async function getAllParents(page:number = 1, take: number = 4) {
     const count = await prisma.parent.count()
     return {allParents, count, page, take}
 }
+async function getParentsByClass(room:string, page:number = 1, take: number = 4) {
+    const skip = (page - 1) * take
+    const allParents = await prisma.parent.findMany({
+        where: {
+            students: {
+                every: {
+                    profile: {
+                        school_class: room
+                    }
+                }
+            }
+        },
+        include: {
+            profile: true,
+            students: true,
+            relations: true
+        },
+        orderBy: {
+            updatedAt: 'desc'
+        },
+        skip,
+        take
+    })
+    const count = await prisma.parent.count({
+        where: {
+            students: {
+                every: {
+                    profile: {
+                        school_class: room
+                    }
+                }
+            }
+        },
+    })
+    return {allParents, count, page, take}
+}
 
-async function getFilteredParents (word: string, take: number = 10) {
+async function getFilteredParents (room:string, word: string, take: number = 10) {
     const allParents = await prisma.parent.findMany({
         where: {
             OR: [
@@ -104,12 +140,26 @@ async function getFilteredParents (word: string, take: number = 10) {
                     first_name: {
                         startsWith: word,
                         mode: 'insensitive'
+                    },
+                    students: {
+                        every: {
+                            profile: {
+                                school_class: room
+                            }
+                        }
                     }
                 },
                 {
                     last_name: {
                         startsWith: word,
                         mode: 'insensitive'
+                    },
+                    students: {
+                        every: {
+                            profile: {
+                                school_class: room
+                            }
+                        }
                     }
                 }
             ]
@@ -165,5 +215,6 @@ export {
     setRelationship,
     getParentById,
     getFilteredParents,
-    updateParent
+    updateParent,
+    getParentsByClass
 }

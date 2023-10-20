@@ -15,12 +15,12 @@ import { signUser, compareDate, verifyUser } from '../services/jwt'
 import crypto from 'crypto'
 import { hashing, compareHash } from '../services/hashing'
 import { sendMail } from '../services/mailer'
-import { sendSMS } from '../services/sms'
+import { sendMTSMS } from '../services/sms'
 
 export default{
     Query: {
         users: async (_: any, args: any, context: any) => {
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new GraphQLError(
                     "You are not authorized to perform this action",
                     {
@@ -72,7 +72,7 @@ export default{
             }
         },
         userById: async (_: any, args: any, context: any) => {
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new GraphQLError(
                     "You are not authorized to perform this action",
                     {
@@ -98,7 +98,7 @@ export default{
             return user
         },
         findUser: async (_: any, args: any, context: any) => {
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new GraphQLError(
                     "You are not authorized to perform this action",
                     {
@@ -113,7 +113,7 @@ export default{
             return users
         },
         refreshToken: async (_: any, __: any, context: any) => {
-            console.dir(context.req.cookies, {depth: null})
+            // console.dir(context.req.cookies, {depth: null})
             // get tokens if available
             if (!context.req.cookies || !context.req.cookies.jsonwebtoken) {
                 throw new GraphQLError(
@@ -173,8 +173,19 @@ export default{
             // save the token
             const user = await createNewUser(args.account, encrypt)
             // generate a url
+            if (!user) {
+                throw new GraphQLError(
+                    "Bad user request body",
+                    {
+                        extensions: {
+                            code: 'FORBIDDEN',
+                            http: { status: 400 }
+                        }
+                    }
+                );   
+            }
             const url = `http://localhost:3000/activate?id=${user.id}&token=${token}`
-            await sendMail(
+            sendMail(
                 `
                 <p>You can now activate your account</p>
                 <p>${url}</p>
@@ -302,8 +313,7 @@ export default{
             return "success password reset"
         },
         createAttendace: async (_: any, args: any, context: any) => {
-            const attend = await createAttendance(args.id, args.studentId)
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new GraphQLError(
                     "You are not authorized to perform this action",
                     {
@@ -314,10 +324,11 @@ export default{
                     }
                 );   
             }
+            const attend = await createAttendance(args.id, args.studentId)
             return attend
         },
         updateCurrentUser: async (_:any, args: any, context: any) => {
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new GraphQLError(
                     "You are not authorized to perform this action",
                     {
@@ -332,7 +343,7 @@ export default{
             return user
         },
         sendBulkSMS: async (_:any, args: any, context: any) => {
-            if (!context.user) {
+            if (!Object.keys(context.user).length) {
                 throw new GraphQLError(
                     "You are not authorized to perform this action",
                     {
@@ -367,8 +378,9 @@ export default{
                     }
                 );   
             }
-            sendSMS(
-                numbers.map((num:any)=> num.phone),
+            console.log('numbers: ', numbers.map((num:any)=> num.phone).join(','))
+            sendMTSMS(
+                numbers.map((num:any)=> num.phone).join(','),
                 args.message
             )
             return 'message sent'

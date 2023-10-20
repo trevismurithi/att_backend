@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const prisma_1 = require("../services/prisma");
 const faker_1 = require("@faker-js/faker");
+const rooms = ['GRADE-1', 'GRADE-2', 'GRADE-3', 'GRADE-4', 'GRADE-5', 'GRADE-6', 'GRADE-7', 'GRADE-8', 'GRADE-9', 'GRADE-10'];
 async function createParents(parents) {
     await prisma_1.prisma.parent.createMany({
         data: parents,
@@ -72,7 +73,7 @@ async function updateParentProfile() {
                 profile: {
                     create: {
                         school_name: 'Junior School',
-                        school_class: faker_1.faker.animal.bird(),
+                        school_class: rooms[Math.trunc(index / 10)],
                         sunday_class: faker_1.faker.animal.bear()
                     }
                 },
