@@ -10,7 +10,6 @@ import {
 
 import { getUserByField } from "../models/user.model";
 
-
 import { GraphQLError } from 'graphql'
 
 export default {

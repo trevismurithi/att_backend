@@ -20,7 +20,7 @@ export async function sendATSMS(numbers: any, message: string) {
             message: message,
             // from: '[Your_sender_ID_goes_here]'
         });
-        console.log(result);
+        console.log(result.data);
     } catch (ex) {
         console.error(ex);
     }
@@ -42,7 +42,29 @@ export async function sendMTSMS(numbers: any, message: string) {
                     "Content-Type": "application/json"
                 }
             })
-            console.log(result)
+            console.log(result.data)
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+export async function sendMTSMSOne(numbers: any, message: string) {
+    try {
+        const result = await axios.post('https://api.mobitechtechnologies.com/sms/sendsms',
+            {
+                "mobile": numbers,
+                "response_type": "json",
+                "sender_name": "23107",
+                "service_id": 0,
+                "message": message
+            },
+            {
+                headers: {
+                    h_api_key: process.env.MOBI_API_KEY,
+                    "Content-Type": "application/json"
+                }
+            })
+            console.log(result.data)
     } catch (error) {
         console.error(error)
     }

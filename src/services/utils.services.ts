@@ -50,4 +50,9 @@ function compareDate (start: string, end: number): number {
     return new Date(timeDiff).getMinutes()
 }
 
-export { fileFilter, adminFileFilter, validate, compareDate }
+function useDateFormat (date: (string|number|Date)) {
+    const formatDate = new Date(date)
+    return formatDate.getDate() + '/' + (formatDate.getMonth() + 1) + '/' + formatDate.getFullYear()
+  }
+
+export { fileFilter, adminFileFilter, validate, compareDate, useDateFormat }

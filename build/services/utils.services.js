@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.compareDate = exports.validate = exports.adminFileFilter = exports.fileFilter = void 0;
+exports.useDateFormat = exports.compareDate = exports.validate = exports.adminFileFilter = exports.fileFilter = void 0;
 const jwt_js_1 = require("./jwt.js");
 const user_model_js_1 = require("../models/user.model.js");
 async function validate(req) {
@@ -54,3 +54,8 @@ function compareDate(start, end) {
     return new Date(timeDiff).getMinutes();
 }
 exports.compareDate = compareDate;
+function useDateFormat(date) {
+    const formatDate = new Date(date);
+    return formatDate.getDate() + '/' + (formatDate.getMonth() + 1) + '/' + formatDate.getFullYear();
+}
+exports.useDateFormat = useDateFormat;

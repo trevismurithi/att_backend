@@ -3,7 +3,7 @@ module.exports = `
 type Query {
     users(page:Int!, take: Int!): UserLimit
     authUser(account: UserAuth!): IsUser
-    userById(id: Int!): User
+    userById(id: Int): User
     refreshToken:Token
     findUser (name: String!): [User]
 }

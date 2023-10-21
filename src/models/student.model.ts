@@ -44,14 +44,39 @@ async function getAllStudents (page:number = 1, take: number = 4) {
     const count = await prisma.student.count()
     return {allStudents, count, page, take}
 }
-async function getFilterStudents (page:number = 1, take: number = 4) {
+
+async function getAllStudentsByClass (room:string, page:number = 1, take: number = 4) {
     const skip = (page - 1) * take
     const allStudents = await prisma.student.findMany({
         where: {
-            booking: {
-                isNot: null
+            profile: {
+                school_class: room
             }
         },
+        orderBy: {
+            createdAt: 'desc'
+        },
+        include: {
+            parent: true,
+            profile: true
+        },
+        skip,
+        take
+    })
+    const count = await prisma.student.count({
+        where: {
+            profile: {
+                school_class: room
+            }
+        }
+    })
+    return {allStudents, count, page, take}
+}
+
+async function getFilterStudents (where:any, page:number = 1, take: number = 4) {
+    const skip = (page - 1) * take
+    const allStudents = await prisma.student.findMany({
+        where,
         include: {
             booking: true,
             parent: true,
@@ -61,38 +86,13 @@ async function getFilterStudents (page:number = 1, take: number = 4) {
         take
     })
     const count = await prisma.student.count({
-        where: {
-            booking: {
-                isNot: null
-            }
-        },
+        where,
     })
     return {allStudents, count, page, take}
 }
-async function getFilterStudentsBooking (word:string, take: number = 4) {
+async function getFilterStudentsBooking (where:any, take: number = 4) {
     const allStudents = await prisma.student.findMany({
-        where: {
-            OR: [
-                {
-                    first_name: {
-                        startsWith: word,
-                        mode: 'insensitive'
-                    },
-                    booking: {
-                        isNot: null
-                    }
-                },
-                {
-                    last_name: {
-                        startsWith: word,
-                        mode: 'insensitive'
-                    },
-                    booking: {
-                        isNot: null
-                    }
-                }
-            ]
-        },
+        where,
         include: {
             booking: true,
             profile: true,
@@ -102,24 +102,9 @@ async function getFilterStudentsBooking (word:string, take: number = 4) {
 
     return allStudents
 }
-async function getFilteredSearchStudents (word: string, take: number = 10) {
+async function getFilteredSearchStudents (where: any, take: number = 10) {
     const allStudents = await prisma.student.findMany({
-        where: {
-            OR: [
-                {
-                    first_name: {
-                        startsWith: word,
-                        mode: 'insensitive'
-                    }
-                },
-                {
-                    last_name: {
-                        startsWith: word,
-                        mode: 'insensitive'
-                    }
-                }
-            ]
-        },
+        where,
         include: {
             parent: true,
             profile: true
@@ -175,7 +160,8 @@ async function setStudentBooking (id: number, booking: any) {
         },
         include: {
             booking: true,
-            profile: true
+            profile: true,
+            parent: true
         }
     })
     return student
@@ -230,6 +216,7 @@ async function updateStudent (id: number, data: any) {
 export {
     createStudent,
     getAllStudents,
+    getAllStudentsByClass,
     getStudentById,
     setStudentProfile,
     setStudentBooking,

@@ -51,7 +51,7 @@ export default{
             // generate token and refresh token
             const token = signUser(
                 {id: user.id, username: user.username},
-                '1h'
+                '3h'
                 )
             const refreshToken = signUser(
                 { id: user.id, username: user.username },
@@ -83,7 +83,8 @@ export default{
                     }
                 );   
             }
-            const user = await getUserByField({id: args.id})
+            const idValue = args.id>0?args.id:context.user.id
+            const user = await getUserByField({id: idValue})
             if (!user) {
                 throw new GraphQLError(
                     "User was not found",
@@ -247,7 +248,7 @@ export default{
             await updateToken(user.id, hashing(token))
             // generate a url
             const url = `http://localhost:3000/activate?id=${user.id}&token=${token}`
-            await sendMail(
+            sendMail(
                 `
                 <html>
                 <p>An email is sent to you to forget password</p>

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getFilterStudentsBooking = exports.updateStudent = exports.updateStudentBooking = exports.getFilteredSearchStudents = exports.getFilterStudents = exports.setStudentBooking = exports.setStudentProfile = exports.getStudentById = exports.getAllStudents = exports.createStudent = void 0;
+exports.getFilterStudentsBooking = exports.updateStudent = exports.updateStudentBooking = exports.getFilteredSearchStudents = exports.getFilterStudents = exports.setStudentBooking = exports.setStudentProfile = exports.getStudentById = exports.getAllStudentsByClass = exports.getAllStudents = exports.createStudent = void 0;
 const prisma_1 = require("../services/prisma");
 async function createStudent(student) {
     const createStudent = await prisma_1.prisma.student.create({
@@ -47,14 +47,38 @@ async function getAllStudents(page = 1, take = 4) {
     return { allStudents, count, page, take };
 }
 exports.getAllStudents = getAllStudents;
-async function getFilterStudents(page = 1, take = 4) {
+async function getAllStudentsByClass(room, page = 1, take = 4) {
     const skip = (page - 1) * take;
     const allStudents = await prisma_1.prisma.student.findMany({
         where: {
-            booking: {
-                isNot: null
+            profile: {
+                school_class: room
             }
         },
+        orderBy: {
+            createdAt: 'desc'
+        },
+        include: {
+            parent: true,
+            profile: true
+        },
+        skip,
+        take
+    });
+    const count = await prisma_1.prisma.student.count({
+        where: {
+            profile: {
+                school_class: room
+            }
+        }
+    });
+    return { allStudents, count, page, take };
+}
+exports.getAllStudentsByClass = getAllStudentsByClass;
+async function getFilterStudents(where, page = 1, take = 4) {
+    const skip = (page - 1) * take;
+    const allStudents = await prisma_1.prisma.student.findMany({
+        where,
         include: {
             booking: true,
             parent: true,
@@ -64,39 +88,14 @@ async function getFilterStudents(page = 1, take = 4) {
         take
     });
     const count = await prisma_1.prisma.student.count({
-        where: {
-            booking: {
-                isNot: null
-            }
-        },
+        where,
     });
     return { allStudents, count, page, take };
 }
 exports.getFilterStudents = getFilterStudents;
-async function getFilterStudentsBooking(word, take = 4) {
+async function getFilterStudentsBooking(where, take = 4) {
     const allStudents = await prisma_1.prisma.student.findMany({
-        where: {
-            OR: [
-                {
-                    first_name: {
-                        startsWith: word,
-                        mode: 'insensitive'
-                    },
-                    booking: {
-                        isNot: null
-                    }
-                },
-                {
-                    last_name: {
-                        startsWith: word,
-                        mode: 'insensitive'
-                    },
-                    booking: {
-                        isNot: null
-                    }
-                }
-            ]
-        },
+        where,
         include: {
             booking: true,
             profile: true,
@@ -106,24 +105,9 @@ async function getFilterStudentsBooking(word, take = 4) {
     return allStudents;
 }
 exports.getFilterStudentsBooking = getFilterStudentsBooking;
-async function getFilteredSearchStudents(word, take = 10) {
+async function getFilteredSearchStudents(where, take = 10) {
     const allStudents = await prisma_1.prisma.student.findMany({
-        where: {
-            OR: [
-                {
-                    first_name: {
-                        startsWith: word,
-                        mode: 'insensitive'
-                    }
-                },
-                {
-                    last_name: {
-                        startsWith: word,
-                        mode: 'insensitive'
-                    }
-                }
-            ]
-        },
+        where,
         include: {
             parent: true,
             profile: true
@@ -179,7 +163,8 @@ async function setStudentBooking(id, booking) {
         },
         include: {
             booking: true,
-            profile: true
+            profile: true,
+            parent: true
         }
     });
     return student;

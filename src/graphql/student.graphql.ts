@@ -12,6 +12,7 @@ type Mutation {
     createProfile (id: Int!, profile: ProfileInput!): Student
     createStudentBooking (id: Int!, booking: BookingInput!): Student
     updateStudentBooking (id: Int!, status: String!): Booking
+    updateStudentBookingDates (id: Int!, from: String!, to: String!): Booking
     updateStudent(id:Int!, data: StudentInput): Student
 }
 
