@@ -7,6 +7,7 @@ exports.sendMTSMSOne = exports.sendMTSMS = exports.sendATSMS = void 0;
 const AfricasTalking = require('africastalking');
 const axios_1 = __importDefault(require("axios"));
 require("dotenv/config");
+const user_model_1 = require("../models/user.model");
 require('dotenv').config();
 // TODO: Initialize Africa's Talking
 const africastalking = AfricasTalking({
@@ -21,7 +22,7 @@ async function sendATSMS(numbers, message) {
             message: message,
             // from: '[Your_sender_ID_goes_here]'
         });
-        console.log(result);
+        console.log(result.data);
     }
     catch (ex) {
         console.error(ex);
@@ -29,7 +30,7 @@ async function sendATSMS(numbers, message) {
 }
 exports.sendATSMS = sendATSMS;
 ;
-async function sendMTSMS(numbers, message) {
+async function sendMTSMS(numbers, message, user) {
     try {
         const result = await axios_1.default.post('https://api.mobitechtechnologies.com/sms/sendbulksms', {
             "mobile": numbers,
@@ -43,6 +44,19 @@ async function sendMTSMS(numbers, message) {
                 "Content-Type": "application/json"
             }
         });
+        const balance = user.wallet.amount - (numbers.split(',').length * .8);
+        await (0, user_model_1.updateUser)(1, {
+            wallet: {
+                upsert: {
+                    create: {
+                        amount: balance
+                    },
+                    update: {
+                        amount: balance
+                    }
+                }
+            }
+        });
         console.log(result.data);
     }
     catch (error) {
@@ -50,7 +64,7 @@ async function sendMTSMS(numbers, message) {
     }
 }
 exports.sendMTSMS = sendMTSMS;
-async function sendMTSMSOne(numbers, message) {
+async function sendMTSMSOne(numbers, message, user) {
     try {
         const result = await axios_1.default.post('https://api.mobitechtechnologies.com/sms/sendsms', {
             "mobile": numbers,
@@ -65,6 +79,19 @@ async function sendMTSMSOne(numbers, message) {
             }
         });
         console.log(result.data);
+        const balance = user.wallet.amount - .8;
+        await (0, user_model_1.updateUser)(1, {
+            wallet: {
+                upsert: {
+                    create: {
+                        amount: balance
+                    },
+                    update: {
+                        amount: balance
+                    }
+                }
+            }
+        });
     }
     catch (error) {
         console.error(error);

@@ -1,6 +1,7 @@
 const AfricasTalking = require('africastalking');
 import axios from 'axios'
 import 'dotenv/config'
+import { updateUser } from '../models/user.model';
 
 require('dotenv').config()
 
@@ -26,7 +27,7 @@ export async function sendATSMS(numbers: any, message: string) {
     }
 };
 
-export async function sendMTSMS(numbers: any, message: string) {
+export async function sendMTSMS(numbers: any, message: string, user:any) {
     try {
         const result = await axios.post('https://api.mobitechtechnologies.com/sms/sendbulksms',
             {
@@ -42,13 +43,26 @@ export async function sendMTSMS(numbers: any, message: string) {
                     "Content-Type": "application/json"
                 }
             })
+            const balance = user.wallet.amount - (numbers.split(',').length * .8)
+            await updateUser(1, {
+                wallet: {
+                    upsert: {
+                        create: {
+                            amount: balance
+                        },
+                        update: {
+                            amount: balance
+                        }
+                    }
+                }
+            })
             console.log(result.data)
     } catch (error) {
         console.error(error)
     }
 }
 
-export async function sendMTSMSOne(numbers: any, message: string) {
+export async function sendMTSMSOne(numbers: any, message: string, user:any) {
     try {
         const result = await axios.post('https://api.mobitechtechnologies.com/sms/sendsms',
             {
@@ -65,6 +79,19 @@ export async function sendMTSMSOne(numbers: any, message: string) {
                 }
             })
             console.log(result.data)
+            const balance = user.wallet.amount - .8
+            await updateUser(1, {
+                wallet: {
+                    upsert: {
+                        create: {
+                            amount: balance
+                        },
+                        update: {
+                            amount: balance
+                        }
+                    }
+                }
+            })
     } catch (error) {
         console.error(error)
     }

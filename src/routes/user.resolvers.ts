@@ -8,7 +8,8 @@ import {
     updateUser,
     deleteToken,
     updateToken,
-    getContactsByUser
+    getContactsByUser,
+    deleteGroup
 } from "../models/user.model"
 import { GraphQLError } from 'graphql'
 import { signUser, compareDate, verifyUser } from '../services/jwt'
@@ -51,11 +52,11 @@ export default{
             // generate token and refresh token
             const token = signUser(
                 {id: user.id, username: user.username},
-                '3h'
+                '1d'
                 )
             const refreshToken = signUser(
                 { id: user.id, username: user.username },
-                '1d'
+                '2d'
             )
             // set cookie in browser
             await context.res.cookie('jsonwebtoken', refreshToken, {
@@ -157,7 +158,7 @@ export default{
             // generate token and refresh token
             const token = signUser(
                 { id: user.id, username: user.username },
-                '1h'
+                '1d'
             )
 
             return {
@@ -379,11 +380,43 @@ export default{
                     }
                 );   
             }
-            console.log('numbers: ', numbers.map((num:any)=> num.phone).join(','))
-            sendMTSMS(
-                numbers.map((num:any)=> num.phone).join(','),
-                args.message
-            )
+            if(user.wallet && user.wallet?.amount > (numbers.length * 0.8)) {
+                sendMTSMS(
+                    numbers.map((num:any)=> num.phone).join(','),
+                    args.message,
+                    user
+                )
+                return 'message sent'
+            }else {
+                return 'message not sent'
+            }
+        },
+        removeGroup: async (_:any, args: any, context: any) => {
+            if (!Object.keys(context.user).length) {
+                throw new GraphQLError(
+                    "You are not authorized to perform this action",
+                    {
+                        extensions: {
+                            code: 'FORBIDDEN',
+                            http: { status: 401 }
+                        }
+                    }
+                );   
+            }
+            const user = await getUserByField({id: context.user.id})
+            if (!user) {
+                throw new GraphQLError(
+                    "You are not authorized to perform this action",
+                    {
+                        extensions: {
+                            code: 'FORBIDDEN',
+                            http: { status: 401 }
+                        }
+                    }
+                );   
+            }
+            const group = await deleteGroup(args.id)
+            console.log('deleted group: ', group)
             return 'message sent'
         },
     }

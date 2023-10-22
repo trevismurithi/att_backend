@@ -276,11 +276,23 @@ export default {
                     }
                 );
             }
+            const user = await getUserByField({id: context.user.id})
+            if (!user) {
+                throw new GraphQLError(
+                    "You are not authorized to perform this action",
+                    {
+                        extensions: {
+                            code: 'FORBIDDEN',
+                            http: { status: 401 }
+                        }
+                    }
+                );   
+            }
             const student = await setStudentBooking(args.id, args.booking)
             const parent = await getParentById(student.parentId)
-            if(parent && parent.profile && student && student.booking) {
+            if(parent && parent.profile && student && student.booking && user.wallet && user.wallet?.amount > 0.8) {
                 const message = `${student.first_name} bus transportation has been created from ${useDateFormat(student.booking.from)} - to ${useDateFormat(student.booking.to)}`
-                sendMTSMSOne(parent.profile?.phone, message)
+                sendMTSMSOne(parent.profile?.phone, message, user)
             }
             return student
         },
@@ -296,13 +308,25 @@ export default {
                     }
                 );
             }
+            const user = await getUserByField({id: context.user.id})
+            if (!user) {
+                throw new GraphQLError(
+                    "You are not authorized to perform this action",
+                    {
+                        extensions: {
+                            code: 'FORBIDDEN',
+                            http: { status: 401 }
+                        }
+                    }
+                );   
+            }
             const booking = await updateStudentBooking(args.id, { status: args.status })
             // send sms to user
             const message = booking.status === 'PICK' ? `${booking.student.first_name} has been picked` : `${booking.student.first_name} has been dropped`
             // find parent of the user
             const parent = await getParentById(booking.student.parentId)
-            if (parent) {
-                sendMTSMSOne(parent.profile?.phone, message,)
+            if (parent && user.wallet && user.wallet?.amount > 0.8) {
+                sendMTSMSOne(parent.profile?.phone, message, user)
             }            
             return booking
         },
@@ -318,13 +342,25 @@ export default {
                     }
                 );
             }
+            const user = await getUserByField({id: context.user.id})
+            if (!user) {
+                throw new GraphQLError(
+                    "You are not authorized to perform this action",
+                    {
+                        extensions: {
+                            code: 'FORBIDDEN',
+                            http: { status: 401 }
+                        }
+                    }
+                );   
+            }
             const booking = await updateStudentBooking(args.id, { status: args.status })
             // send sms to user
             const message = `${booking.student.first_name} bus transportation has been updated from ${useDateFormat(booking.from)} - to ${useDateFormat(booking.to)}`
             // find parent of the user
             const parent = await getParentById(booking.student.parentId)
-            if (parent && parent.profile) {
-                sendMTSMSOne(parent.profile?.phone, message)
+            if (parent && parent.profile && user.wallet && user.wallet?.amount > 0.8) {
+                sendMTSMSOne(parent.profile?.phone, message, user)
             }            
             return booking
         },

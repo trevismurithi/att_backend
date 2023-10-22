@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getContactsByUser = exports.updateToken = exports.updateUser = exports.getTokenById = exports.deleteToken = exports.createToken = exports.createAttendance = exports.getUserByField = exports.getUserBySearch = exports.getUsers = exports.createUser = void 0;
+exports.deleteGroup = exports.getContactsByUser = exports.updateToken = exports.updateUser = exports.getTokenById = exports.deleteToken = exports.createToken = exports.createAttendance = exports.getUserByField = exports.getUserBySearch = exports.getUsers = exports.createUser = void 0;
 const prisma_1 = require("../services/prisma");
 const hashing_1 = require("../services/hashing");
 async function createUser(account, crypted) {
@@ -19,7 +19,7 @@ async function createUser(account, crypted) {
                     token: crypted
                 }
             }
-        }
+        },
     });
     return userRole;
 }
@@ -39,6 +39,7 @@ async function getUserByField(field) {
         where: field,
         include: {
             groups: true,
+            wallet: true
         }
     });
     return userRole;
@@ -160,7 +161,8 @@ async function updateUser(id, body) {
         },
         data: body,
         include: {
-            groups: true
+            groups: true,
+            wallet: true
         }
     });
     return user;
@@ -183,3 +185,12 @@ async function getContactsByUser(id, group) {
     return contacts;
 }
 exports.getContactsByUser = getContactsByUser;
+async function deleteGroup(id) {
+    const group = await prisma_1.prisma.group.delete({
+        where: {
+            id
+        }
+    });
+    return group;
+}
+exports.deleteGroup = deleteGroup;

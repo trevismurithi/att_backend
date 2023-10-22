@@ -8,7 +8,6 @@ const nodemailer_1 = __importDefault(require("nodemailer"));
 require("dotenv/config");
 // async..await is not allowed in global scope, must use a wrapper
 async function sendMail(html, email) {
-    console.log('email: ', email);
     // Generate test SMTP service account from ethereal.email
     // Only needed if you don't have a real mail account for testing
     // create reusable transporter object using the default SMTP transport

@@ -21,6 +21,7 @@ model User {
   password   String
   class      String?
   enabled    Boolean
+  wallet     Wallet?
   token      Token?
   attendance Attendace[]
   groups     Group[]
@@ -35,7 +36,7 @@ model Student {
   birthday   DateTime
   sex        String
   profile    Profile?
-  parent     Parent?       @relation(fields: [parentId], references: [id])
+  parent     Parent?       @relation(fields: [parentId], references: [id], onDelete: Cascade)
   parentId   Int
   booking    Booking?
   relations  Relationship?
@@ -63,7 +64,7 @@ model ParentProfile {
   idCard    String
   phone     String   @unique @db.VarChar(255)
   location  String   @db.VarChar(255)
-  parent    Parent   @relation(fields: [parentId], references: [id])
+  parent    Parent   @relation(fields: [parentId], references: [id], onDelete: Cascade)
   parentId  Int      @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -75,7 +76,7 @@ model Profile {
   school_class String?  @db.VarChar(255)
   sunday_class String   @db.VarChar(255)
   image        String?
-  student      Student  @relation(fields: [studentId], references: [id])
+  student      Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
   studentId    Int      @unique
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -84,9 +85,9 @@ model Profile {
 model Relationship {
   id        Int      @id @default(autoincrement())
   status    String
-  parent    Parent   @relation(fields: [parentId], references: [id])
+  parent    Parent   @relation(fields: [parentId], references: [id], onDelete: Cascade)
   parentId  Int
-  student   Student  @relation(fields: [studentId], references: [id])
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
   studentId Int      @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -96,8 +97,8 @@ model Relationship {
 
 model Attendace {
   id        Int      @id @default(autoincrement())
-  student   Student  @relation(fields: [studentId], references: [id])
-  user      User     @relation(fields: [userId], references: [id])
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   studentId Int
   userId    Int
   createdAt DateTime @default(now())
@@ -107,7 +108,7 @@ model Attendace {
 model Token {
   id        Int      @id @default(autoincrement())
   token     String
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    Int      @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -118,7 +119,7 @@ model Booking {
   from      DateTime
   to        DateTime
   status    Status
-  student   Student  @relation(fields: [studentId], references: [id])
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
   studentId Int      @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -128,7 +129,7 @@ model Group {
   id        Int        @id @default(autoincrement())
   name      String     @db.VarChar(255)
   contacts  Contacts[]
-  user      User       @relation(fields: [userId], references: [id])
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    Int
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
@@ -137,8 +138,17 @@ model Group {
 model Contacts {
   id        Int      @id @default(autoincrement())
   phone     String   @db.VarChar(255)
-  group     Group    @relation(fields: [groupId], references: [id])
+  group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
   groupId   Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Wallet {
+  id        Int      @id @default(autoincrement())
+  amount    Float
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int      @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

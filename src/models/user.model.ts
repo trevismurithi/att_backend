@@ -17,8 +17,13 @@ async function createUser(account: any, crypted: string) {
                 create: {
                     token: crypted
                 }
+            },
+            wallet: {
+                 create: {
+                    amount: 0
+                 }
             }
-        }
+        },
     })
     return userRole
 }
@@ -38,11 +43,11 @@ async function getUserByField (field: any) {
         where: field, 
         include: {
             groups: true,
+            wallet: true
         }
     })
     return userRole
 }
-
 
 async function getUserBySearch (word: string, take: number = 10) {
     const users = await prisma.user.findMany({
@@ -160,7 +165,8 @@ async function updateUser (id: number, body: any) {
         },
         data: body,
         include: {
-            groups: true
+            groups: true,
+            wallet: true
         }
     })
     return user
@@ -183,6 +189,15 @@ async function getContactsByUser (id: number, group: string) {
     return contacts
 }
 
+async function deleteGroup(id:number) {
+    const group = await prisma.group.delete({
+        where: {
+            id
+        }
+    })
+    return group
+}
+
 export {
     createUser,
     getUsers,
@@ -194,5 +209,6 @@ export {
     getTokenById,
     updateUser,
     updateToken,
-    getContactsByUser
+    getContactsByUser,
+    deleteGroup
 }

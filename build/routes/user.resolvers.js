@@ -62,7 +62,6 @@ exports.default = {
             }
             const idValue = args.id > 0 ? args.id : context.user.id;
             const user = await (0, user_model_1.getUserByField)({ id: idValue });
-            console.log('user: ', user, '-', idValue, '- -', args.id, context.user);
             if (!user) {
                 throw new graphql_1.GraphQLError("User was not found", {
                     extensions: {
@@ -188,7 +187,7 @@ exports.default = {
             await (0, user_model_1.updateToken)(user.id, (0, hashing_1.hashing)(token));
             // generate a url
             const url = `http://localhost:3000/activate?id=${user.id}&token=${token}`;
-            await (0, mailer_1.sendMail)(`
+            (0, mailer_1.sendMail)(`
                 <html>
                 <p>An email is sent to you to forget password</p>
                 <p>${url}</p>
@@ -288,8 +287,34 @@ exports.default = {
                     }
                 });
             }
-            console.log('numbers: ', numbers.map((num) => num.phone).join(','));
-            (0, sms_1.sendMTSMS)(numbers.map((num) => num.phone).join(','), args.message);
+            if (user.wallet && user.wallet?.amount > (numbers.length * 0.8)) {
+                (0, sms_1.sendMTSMS)(numbers.map((num) => num.phone).join(','), args.message, user);
+                return 'message sent';
+            }
+            else {
+                return 'message not sent';
+            }
+        },
+        removeGroup: async (_, args, context) => {
+            if (!Object.keys(context.user).length) {
+                throw new graphql_1.GraphQLError("You are not authorized to perform this action", {
+                    extensions: {
+                        code: 'FORBIDDEN',
+                        http: { status: 401 }
+                    }
+                });
+            }
+            const user = await (0, user_model_1.getUserByField)({ id: context.user.id });
+            if (!user) {
+                throw new graphql_1.GraphQLError("You are not authorized to perform this action", {
+                    extensions: {
+                        code: 'FORBIDDEN',
+                        http: { status: 401 }
+                    }
+                });
+            }
+            const group = await (0, user_model_1.deleteGroup)(args.id);
+            console.log('deleted group: ', group);
             return 'message sent';
         },
     }
