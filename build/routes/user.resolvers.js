@@ -36,8 +36,8 @@ exports.default = {
             }
             // TDOD: check if user is enabled
             // generate token and refresh token
-            const token = (0, jwt_1.signUser)({ id: user.id, username: user.username }, '3h');
-            const refreshToken = (0, jwt_1.signUser)({ id: user.id, username: user.username }, '1d');
+            const token = (0, jwt_1.signUser)({ id: user.id, username: user.username }, '1d');
+            const refreshToken = (0, jwt_1.signUser)({ id: user.id, username: user.username }, '2d');
             // set cookie in browser
             await context.res.cookie('jsonwebtoken', refreshToken, {
                 path: '/',
@@ -116,7 +116,7 @@ exports.default = {
                 });
             }
             // generate token and refresh token
-            const token = (0, jwt_1.signUser)({ id: user.id, username: user.username }, '1h');
+            const token = (0, jwt_1.signUser)({ id: user.id, username: user.username }, '1d');
             return {
                 token
             };
@@ -139,7 +139,7 @@ exports.default = {
                     }
                 });
             }
-            const url = `http://localhost:3000/activate?id=${user.id}&token=${token}`;
+            const url = `http://localhost:3000/auth/activate?id=${user.id}&token=${token}`;
             (0, mailer_1.sendMail)(`
                 <p>You can now activate your account</p>
                 <p>${url}</p>
@@ -186,7 +186,7 @@ exports.default = {
             const token = crypto_1.default.randomBytes(32).toString('hex');
             await (0, user_model_1.updateToken)(user.id, (0, hashing_1.hashing)(token));
             // generate a url
-            const url = `http://localhost:3000/activate?id=${user.id}&token=${token}`;
+            const url = `http://localhost:3000/auth/activate?id=${user.id}&token=${token}`;
             (0, mailer_1.sendMail)(`
                 <html>
                 <p>An email is sent to you to forget password</p>

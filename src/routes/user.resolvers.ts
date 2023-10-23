@@ -186,7 +186,7 @@ export default{
                     }
                 );   
             }
-            const url = `http://localhost:3000/activate?id=${user.id}&token=${token}`
+            const url = `http://localhost:3000/auth/activate?id=${user.id}&token=${token}`
             sendMail(
                 `
                 <p>You can now activate your account</p>
@@ -248,7 +248,7 @@ export default{
             const token = crypto.randomBytes(32).toString('hex')
             await updateToken(user.id, hashing(token))
             // generate a url
-            const url = `http://localhost:3000/activate?id=${user.id}&token=${token}`
+            const url = `http://localhost:3000/auth/activate?id=${user.id}&token=${token}`
             sendMail(
                 `
                 <html>

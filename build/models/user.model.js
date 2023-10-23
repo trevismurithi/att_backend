@@ -18,6 +18,11 @@ async function createUser(account, crypted) {
                 create: {
                     token: crypted
                 }
+            },
+            wallet: {
+                create: {
+                    amount: 0
+                }
             }
         },
     });
