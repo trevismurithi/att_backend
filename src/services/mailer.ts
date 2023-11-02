@@ -1,8 +1,24 @@
 import nodemailer from 'nodemailer'
 import 'dotenv/config'
+import pug from 'pug'
+import path from 'path'
 
+type Email = {
+    name: string
+    content: string
+    link: string
+    buttonText: string,
+    header: string
+}
+
+async function renderPug(data: Email, to: string, title: string) {
+    // Compile the source code
+    const html = pug.renderFile(
+        path.join(__dirname, '..', '..', 'templates', 'AccountCreation.pug'), data)
+        await sendMail(html, to, title, data.content)
+}
 // async..await is not allowed in global scope, must use a wrapper
-async function sendMail(html: string, email: string) {
+async function sendMail(html: string, email: string, subject: string, text: string) {
     // Generate test SMTP service account from ethereal.email
     // Only needed if you don't have a real mail account for testing
 
@@ -22,10 +38,10 @@ async function sendMail(html: string, email: string) {
 
     // send mail with defined transport object
     let info = await transporter.sendMail({
-        from: '"Support Team 👻" <trevis.wamuthenya@mwook.com>', // sender address
+        from: '"Support Team 🚀" <trevis.wamuthenya@mwook.com>', // sender address
         to: email, // list of receivers
-        subject: "Hello ✔", // Subject line
-        text: "Hello world?", // plain text body
+        subject: subject, // Subject line
+        text, // plain text body
         html // html body
     });
 
@@ -38,5 +54,5 @@ async function sendMail(html: string, email: string) {
 }
 
 export {
-    sendMail
+    renderPug
 }

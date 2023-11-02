@@ -10,6 +10,7 @@ const crypto_1 = __importDefault(require("crypto"));
 const hashing_1 = require("../services/hashing");
 const mailer_1 = require("../services/mailer");
 const sms_1 = require("../services/sms");
+require("dotenv/config");
 exports.default = {
     Query: {
         users: async (_, args, context) => {
@@ -139,11 +140,14 @@ exports.default = {
                     }
                 });
             }
-            const url = `http://localhost:3000/auth/activate?id=${user.id}&token=${token}`;
-            (0, mailer_1.sendMail)(`
-                <p>You can now activate your account</p>
-                <p>${url}</p>
-                `, user.email);
+            const link = `${process.env.CLIENT_URL}/auth/activate?id=${user.id}&token=${token}`;
+            (0, mailer_1.renderPug)({
+                name: user.username,
+                content: "Congratulations on creating your Alpha Dream account! To make the most of your experience, please activate your account by clicking the button below. We're excited to have you join our community!",
+                link,
+                buttonText: 'Activate Account',
+                header: 'Congratulations on creating your Alpha Dream account! To make the most of your experience, please activate your account'
+            }, user.email, 'WELCOME TO ALPHA DREAM');
             return user;
         },
         activateUser: async (_, args) => {
@@ -186,15 +190,14 @@ exports.default = {
             const token = crypto_1.default.randomBytes(32).toString('hex');
             await (0, user_model_1.updateToken)(user.id, (0, hashing_1.hashing)(token));
             // generate a url
-            const url = `http://localhost:3000/auth/activate?id=${user.id}&token=${token}`;
-            (0, mailer_1.sendMail)(`
-                <html>
-                <p>An email is sent to you to forget password</p>
-                <p>${url}</p>
-                </html>
-                `, user.email).catch(error => {
-                console.log('error forgot: ', error);
-            });
+            const link = `${process.env.CLIENT_URL}/auth/reset?id=${user.id}&token=${token}`;
+            (0, mailer_1.renderPug)({
+                name: user.username,
+                content: "It happens to the best of us! If you've forgotten your password, don't worry – we've got you covered. To reset your password and regain access to your account, simply click on the link below:",
+                link,
+                buttonText: 'Reset Password',
+                header: "It happens to the best of us! If you've forgotten your password, don't worry – we've got you covered"
+            }, user.email, 'FORGOT PASSWORD');
             return `email sent to ${args.email}...`;
         },
         resetPassword: async (_, args) => {
