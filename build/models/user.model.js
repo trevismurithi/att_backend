@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteGroup = exports.getContactsByUser = exports.updateToken = exports.updateUser = exports.getTokenById = exports.deleteToken = exports.createToken = exports.createAttendance = exports.getUserByField = exports.getUserBySearch = exports.getUsers = exports.createUser = void 0;
+exports.getAttendance = exports.deleteGroup = exports.getContactsByUser = exports.updateToken = exports.updateUser = exports.getTokenById = exports.deleteToken = exports.createToken = exports.createAttendance = exports.getUserByField = exports.getUserBySearch = exports.getUsers = exports.createUser = void 0;
 const prisma_1 = require("../services/prisma");
 const hashing_1 = require("../services/hashing");
 async function createUser(account, crypted) {
@@ -9,6 +9,7 @@ async function createUser(account, crypted) {
             username: account.username,
             first_name: account.first_name,
             last_name: account.last_name,
+            role: account.role,
             email: account.email,
             class: account.class,
             enabled: false,
@@ -79,19 +80,25 @@ async function getUserBySearch(word, take = 10) {
     return users;
 }
 exports.getUserBySearch = getUserBySearch;
-async function createAttendance(id, studentId) {
-    const present = await prisma_1.prisma.user.update({
+async function getAttendance(page = 1, take = 4) {
+    const skip = (page - 1) * take;
+    const attendace = await prisma_1.prisma.attendace.findMany({
+        skip,
+        take
+    });
+    const count = await prisma_1.prisma.attendace.count();
+    return { attendace, count, page, take };
+}
+exports.getAttendance = getAttendance;
+async function createAttendance(id, total) {
+    const user = await prisma_1.prisma.user.update({
         where: {
             id
         },
         data: {
             attendance: {
                 create: {
-                    student: {
-                        connect: {
-                            id: studentId
-                        }
-                    }
+                    total
                 }
             }
         },
@@ -99,7 +106,7 @@ async function createAttendance(id, studentId) {
             attendance: true
         }
     });
-    return present;
+    return user;
 }
 exports.createAttendance = createAttendance;
 async function createToken(crypted, id) {

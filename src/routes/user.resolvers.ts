@@ -9,7 +9,8 @@ import {
     deleteToken,
     updateToken,
     getContactsByUser,
-    deleteGroup
+    deleteGroup,
+    getAttendance
 } from "../models/user.model"
 import { GraphQLError } from 'graphql'
 import { signUser, compareDate, verifyUser } from '../services/jwt'
@@ -165,6 +166,21 @@ export default {
             return {
                 token
             }
+        },
+        attendances: async (_: any, args: any, context: any) => {
+            if (!Object.keys(context.user).length) {
+                throw new GraphQLError(
+                    "You are not authorized to perform this action",
+                    {
+                        extensions: {
+                            code: 'FORBIDDEN',
+                            http: { status: 401 }
+                        }
+                    }
+                );
+            }
+            const attendace = await getAttendance(args.page, args.take)
+            return attendace
         }
     },
     Mutation: {
@@ -323,8 +339,8 @@ export default {
                     }
                 );
             }
-            const attend = await createAttendance(args.id, args.studentId)
-            return attend
+            const user = await createAttendance(args.id, args.total)
+            return user
         },
         updateCurrentUser: async (_: any, args: any, context: any) => {
             if (!Object.keys(context.user).length) {

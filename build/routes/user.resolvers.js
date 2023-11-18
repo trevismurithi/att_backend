@@ -121,6 +121,18 @@ exports.default = {
             return {
                 token
             };
+        },
+        attendances: async (_, args, context) => {
+            if (!Object.keys(context.user).length) {
+                throw new graphql_1.GraphQLError("You are not authorized to perform this action", {
+                    extensions: {
+                        code: 'FORBIDDEN',
+                        http: { status: 401 }
+                    }
+                });
+            }
+            const attendace = await (0, user_model_1.getAttendance)(args.page, args.take);
+            return attendace;
         }
     },
     Mutation: {
@@ -142,7 +154,7 @@ exports.default = {
             }
             const link = `${process.env.CLIENT_URL}/auth/activate?id=${user.id}&token=${token}`;
             (0, mailer_1.renderPug)({
-                name: user.username,
+                name: user.first_name,
                 content: "Congratulations on creating your Alpha Dream account! To make the most of your experience, please activate your account by clicking the button below. We're excited to have you join our community!",
                 link,
                 buttonText: 'Activate Account',
@@ -192,7 +204,7 @@ exports.default = {
             // generate a url
             const link = `${process.env.CLIENT_URL}/auth/reset?id=${user.id}&token=${token}`;
             (0, mailer_1.renderPug)({
-                name: user.username,
+                name: user.first_name,
                 content: "It happens to the best of us! If you've forgotten your password, don't worry – we've got you covered. To reset your password and regain access to your account, simply click on the link below:",
                 link,
                 buttonText: 'Reset Password',
@@ -248,8 +260,8 @@ exports.default = {
                     }
                 });
             }
-            const attend = await (0, user_model_1.createAttendance)(args.id, args.studentId);
-            return attend;
+            const user = await (0, user_model_1.createAttendance)(args.id, args.total);
+            return user;
         },
         updateCurrentUser: async (_, args, context) => {
             if (!Object.keys(context.user).length) {

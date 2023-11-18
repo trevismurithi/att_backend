@@ -1,6 +1,7 @@
 export = /* GraphQL */ `
 type Query {
     users(page:Int!, take: Int!): UserLimit
+    attendances(page:Int!, take: Int!): AttendaceLimit
     authUser(account: UserAuth!): IsUser
     userById(id: Int): User
     refreshToken:Token
@@ -9,7 +10,7 @@ type Query {
 
 type Mutation {
     createUser(account: UserInput): User
-    createAttendace(id: Int!, studentId: Int): User
+    createAttendace(id: Int!, total: Int!): User
     activateUser(id: Int!, token: String!): User
     forgotPassword(email: String!): String
     resetPassword(id: Int!, token: String!, password: String!): String
@@ -46,6 +47,21 @@ type User {
     createdAt: String
     groups: [Group]
     wallet: Wallet
+    attendace: Attendance
+}
+
+type AttendaceLimit {
+    attendace: [Attendance]
+    count: Int
+    page: Int
+    take: Int
+ }
+
+type Attendance {
+    id: Int
+    total: Int
+    createdAt: String
+    updatedAt: String
 }
 
 type Group {
@@ -72,6 +88,7 @@ input UserInput {
     username: String
     first_name: String
     last_name: String
+    role: String
     email: String
     idCard: String
     class: String

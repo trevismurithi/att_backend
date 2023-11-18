@@ -8,6 +8,7 @@ async function createUser(account: any, crypted: string) {
             username: account.username,
             first_name: account.first_name,
             last_name: account.last_name,
+            role: account.role,
             email: account.email,
             class: account.class,
             enabled: false,
@@ -78,19 +79,26 @@ async function getUserBySearch (word: string, take: number = 10) {
     return users
 }
 
-async function createAttendance(id: number, studentId: number) {
-    const present = await prisma.user.update({
+async function getAttendance (page:number = 1, take: number = 4) {
+    const skip = (page - 1) * take
+    const attendace = await prisma.attendace.findMany({
+        skip,
+        take
+    })
+    const count = await prisma.attendace.count()
+    return {attendace, count, page, take}
+}
+
+
+async function createAttendance(id: number, total: number) {
+    const user = await prisma.user.update({
         where: {
             id
         },
         data: {
             attendance: {
                 create: {
-                    student: {
-                        connect: {
-                            id: studentId
-                        }
-                    }
+                    total
                 }
             }
         },
@@ -98,7 +106,7 @@ async function createAttendance(id: number, studentId: number) {
             attendance: true
         }
     })
-    return present
+    return user
 }
 
 async function createToken (crypted: string, id: number) {
@@ -210,5 +218,6 @@ export {
     updateUser,
     updateToken,
     getContactsByUser,
-    deleteGroup
+    deleteGroup,
+    getAttendance
 }

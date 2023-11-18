@@ -63,8 +63,6 @@ async function uploadCSV (req:any, res:any) {
     }
 }
 
-
-
 export {
     uploadCSV
 }

@@ -40,7 +40,6 @@ model Student {
   parentId   Int
   booking    Booking?
   relations  Relationship?
-  attendance Attendace[]
   createdAt  DateTime      @default(now())
   updatedAt  DateTime      @updatedAt
 }
@@ -97,9 +96,8 @@ model Relationship {
 
 model Attendace {
   id        Int      @id @default(autoincrement())
-  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  total     Int
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  studentId Int
   userId    Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
