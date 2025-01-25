@@ -15,7 +15,11 @@ async function renderPug(data: Email, to: string, title: string) {
     // Compile the source code
     const html = pug.renderFile(
         path.join(__dirname, '..', '..', 'templates', 'AccountCreation.pug'), data)
-        await sendMail(html, to, title, data.content)
+        try {
+            await sendMail(html, to, title, data.content)
+        } catch (error) {
+            console.error(error)
+        }
 }
 // async..await is not allowed in global scope, must use a wrapper
 async function sendMail(html: string, email: string, subject: string, text: string) {

@@ -174,6 +174,34 @@ async function getFilteredParents (room:string, word: string, take: number = 10)
     return allParents
 }
 
+async function getAdminFilteredParents (word: string, take: number = 10) {
+    const allParents = await prisma.parent.findMany({
+        where: {
+            OR: [
+                {
+                    first_name: {
+                        startsWith: word,
+                        mode: 'insensitive'
+                    },
+                },
+                {
+                    last_name: {
+                        startsWith: word,
+                        mode: 'insensitive'
+                    },
+                }
+            ]
+        },
+        include: {
+            profile: true,
+            students: true,
+            relations: true
+        },
+        take
+    })
+    return allParents
+}
+
 async function updateParent (id: number, data: any) {
     const parent = await prisma.parent.update({
         where: {
@@ -215,6 +243,7 @@ export {
     setRelationship,
     getParentById,
     getFilteredParents,
+    getAdminFilteredParents,
     updateParent,
     getParentsByClass
 }

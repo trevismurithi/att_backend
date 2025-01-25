@@ -5,7 +5,8 @@ import {
     getParentById,
     getFilteredParents,
     updateParent,
-    getParentsByClass
+    getParentsByClass,
+    getAdminFilteredParents
 } from "../models/parent.model"
 
 import { getUserByField } from "../models/user.model";
@@ -83,7 +84,7 @@ export default {
                 );  
             }
             if (user.role === 'ADMIN') {
-                return getFilteredParents('', args.name)
+                return getAdminFilteredParents(args.name)
             }
             return getFilteredParents(user.class, args.name)
         },

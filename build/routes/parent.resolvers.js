@@ -59,7 +59,7 @@ exports.default = {
                 });
             }
             if (user.role === 'ADMIN') {
-                return (0, parent_model_1.getFilteredParents)('', args.name);
+                return (0, parent_model_1.getAdminFilteredParents)(args.name);
             }
             return (0, parent_model_1.getFilteredParents)(user.class, args.name);
         },

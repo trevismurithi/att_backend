@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getParentsByClass = exports.updateParent = exports.getFilteredParents = exports.getParentById = exports.setRelationship = exports.getAllParents = exports.createParent = void 0;
+exports.getParentsByClass = exports.updateParent = exports.getAdminFilteredParents = exports.getFilteredParents = exports.getParentById = exports.setRelationship = exports.getAllParents = exports.createParent = void 0;
 const prisma_1 = require("../services/prisma");
 async function createParent(parent) {
     const userParent = await prisma_1.prisma.parent.create({
@@ -177,6 +177,34 @@ async function getFilteredParents(room, word, take = 10) {
     return allParents;
 }
 exports.getFilteredParents = getFilteredParents;
+async function getAdminFilteredParents(word, take = 10) {
+    const allParents = await prisma_1.prisma.parent.findMany({
+        where: {
+            OR: [
+                {
+                    first_name: {
+                        startsWith: word,
+                        mode: 'insensitive'
+                    },
+                },
+                {
+                    last_name: {
+                        startsWith: word,
+                        mode: 'insensitive'
+                    },
+                }
+            ]
+        },
+        include: {
+            profile: true,
+            students: true,
+            relations: true
+        },
+        take
+    });
+    return allParents;
+}
+exports.getAdminFilteredParents = getAdminFilteredParents;
 async function updateParent(id, data) {
     const parent = await prisma_1.prisma.parent.update({
         where: {

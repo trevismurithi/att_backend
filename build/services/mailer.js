@@ -11,7 +11,12 @@ const path_1 = __importDefault(require("path"));
 async function renderPug(data, to, title) {
     // Compile the source code
     const html = pug_1.default.renderFile(path_1.default.join(__dirname, '..', '..', 'templates', 'AccountCreation.pug'), data);
-    await sendMail(html, to, title, data.content);
+    try {
+        await sendMail(html, to, title, data.content);
+    }
+    catch (error) {
+        console.error(error);
+    }
 }
 exports.renderPug = renderPug;
 // async..await is not allowed in global scope, must use a wrapper
